@@ -1,0 +1,4 @@
+com\javaweb\departmentmanage\utils\AliyunOSSproperties.class
+com\javaweb\departmentmanage\utils\JwtUtils.class
+com\javaweb\departmentmanage\utils\BaseContext.class
+com\javaweb\departmentmanage\utils\AliyunOSSOperator.class

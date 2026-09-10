@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: DepartmentManage
+  datasource:
+    url: jdbc:mysql://localhost:3306/tlias
+    username: root
+    password: Camus.123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 30000
+      connection-timeout: 30000
+      max-lifetime: 28000
+      pool-name: MySpringBootHikariPool
+  # 配置上传文件的最大大小
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+
+# 配置mybatis
+mybatis:
+  mapper-locations:
+    - classpath:mapper/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  # 开启驼峰命名开关--->mybatis自动封装
+    map-underscore-to-camel-case: true
+
+# 配置事务管理日志为debug
+logging:
+  level:
+    org.springframework.jdbc.support.JdbcTransactionManager: debug
+
+# 配置云服务的三个信息
+aliyun:
+  oss:
+    endpoint: https://oss-cn-beijing.aliyuncs.com
+    bucket-name: java-spring-upload
+    region: cn-beijing
+

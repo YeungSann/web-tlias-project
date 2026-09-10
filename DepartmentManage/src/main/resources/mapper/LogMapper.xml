@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.javaweb.departmentmanage.mapper.LogMapper">
+
+    <!-- 1. 条件统计总数 -->
+    <select id="count" resultType="java.lang.Long">
+        select count(*)
+        from log l
+        left join emp e on l.operate_emp_id = e.id
+        <where>
+            <if test="operatorName != null and operatorName != ''">
+                and e.name like concat('%', #{operatorName}, '%')
+            </if>
+            <if test="className != null and className != ''">
+                and l.class_name like concat('%', #{className}, '%')
+            </if>
+            <if test="beginTime != null and endTime != null">
+                and l.operation_time between #{beginTime} and #{endTime}
+            </if>
+        </where>
+    </select>
+
+    <!-- 2. 条件分页列表查询 -->
+    <select id="page" resultType="com.javaweb.departmentmanage.pojo.Logger">
+        select l.id, l.operate_emp_id, l.operation_time, l.class_name, l.method_name, l.args, l.result, l.cost_time
+        from log l
+        left join emp e on l.operate_emp_id = e.id
+        <where>
+            <if test="queryParam.operatorName != null and queryParam.operatorName != ''">
+                and e.name like concat('%', #{queryParam.operatorName}, '%')
+            </if>
+            <if test="queryParam.className != null and queryParam.className != ''">
+                and l.class_name like concat('%', #{queryParam.className}, '%')
+            </if>
+            <if test="queryParam.beginTime != null and queryParam.endTime != null">
+                and l.operation_time between #{queryParam.beginTime} and #{queryParam.endTime}
+            </if>
+        </where>
+        order by l.operation_time desc
+        limit #{start}, #{pageSize}
+    </select>
+
+</mapper>

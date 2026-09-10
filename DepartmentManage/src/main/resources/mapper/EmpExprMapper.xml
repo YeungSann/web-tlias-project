@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.javaweb.departmentmanage.mapper.EmpExprMapper">
+    <insert id="saveBatchExpr" >
+        insert into emp_expr (emp_id,begin,end,company,job) values
+        <!--   collection属性指定我们要遍历的集合对象
+             item：集合遍历出来的元素
+             separator：每个元素之间的分隔符
+              open：遍历开始前的括号
+               close：遍历结束后的括号 -->
+        <foreach collection="exprList" item="expr" separator=",">
+            (#{expr.empId},#{expr.begin},#{expr.end},#{expr.company},#{expr.job})
+        </foreach>
+    </insert>
+
+<!--  delete * from emp_expr where emp_id in (1,2,3) 动态sql批量删除  -->
+    <delete id="deleteByEmpIds">
+        delete from emp_expr where emp_id in
+        <!--   遍历empIds集合，将每个元素转换为字符串，用逗号隔开 -->
+<!--    使用emp_expr表中的emp_id字段，来删除员工表达式信息，而不是id字段
+    因为emp_id字段是emp表中的id字段的逻辑外键关系，所以我们可以直接使用emp_id字段来删除员工表达式信息 -->
+        <foreach collection="empIds" item="empId" open="(" close=")" separator=",">
+                #{empId}
+        </foreach>
+    </delete>
+</mapper>

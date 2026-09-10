@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.javaweb.departmentmanage.mapper.EmpMapper">
+
+
+
+    <!--    原来：
+    <select id="list2" resultType="com.javaweb.departmentmanage.pojo.Emp">
+        select e.* ,d.name deptName from emp e left join dept d on e.dept_id = d.id
+        where
+            此处会导致识别有问题，因为%是sql中的通配符，需要转义
+            这么写，会导致占位符？出现在' ' 之中，导致？失效
+            e.name like '%#{name}%'
+            and e.gender = #{gender}
+            and e.entry_date between #{begin} and #{end}
+        order by e.update_time desc
+    </select>  -->
+
+<!--    注意：id属性必须与EmpMapper.java中的方法名一致，否则会报错！-->
+    <!--
+    <select id="list2" resultType="com.javaweb.departmentmanage.pojo.Emp">
+        select e.* ,d.name deptName from emp e left join dept d on e.dept_id = d.id
+        where
+         这里使用了字符串拼接，来避免%被解析为sql中的通配符，导致查询失败
+        e.name like concat('%', #{name}, '%')
+        and e.gender = #{gender}
+        and e.entry_date between #{begin} and #{end}
+        order by e.update_time desc
+    </select>  -->
+
+
+    <select id="list3" resultType="com.javaweb.departmentmanage.pojo.Emp">
+        select e.* ,d.name deptName from emp e left join dept d on e.dept_id = d.id
+        <where>
+        <!--  这里使用了字符串拼接，来避免%被解析为sql中的通配符，导致查询失败 -->
+        <!-- 写入动态sql语句进行条件查询 -->
+            <if test="name != null and name != ''">
+            e.name like concat('%', #{name}, '%')
+            </if>
+            <if test="gender != null and gender != ''">
+            and e.gender = #{gender}
+            </if>
+            <if test="begin != null and end != null">
+            and e.entry_date between #{begin} and #{end}
+            </if>
+        </where>
+            order by e.update_time desc
+
+    </select>
+
+    <!--    删除员工基本信息，使用动态sql语句，根据id批量删除员工信息 -->
+    <delete id="deleteByIds">
+<!--  delete * from emp where id in (1,2,3) 动态sql批量删除  -->
+        delete from emp where id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                #{id}
+        </foreach>
+    </delete>
+
+<!--  使用外连接查询员工信息和工作经历信息  -->
+<!--    手动结果封装：使用下面的resultMap标签进行封装  -->
+    <select id="selectById" resultMap="empResultMap">
+        select e.* ,
+            ex.id exId,
+            ex.begin exBegin,
+            ex.end exEnd,
+            ex.company exCompany,
+            ex.job exJob
+        from emp e left join emp_expr ex on e.id = ex.emp_id
+        where e.id = #{id}
+    </select>
+
+<!--  对上面的resultMap进行手动结果封装：使用resultMap标签进行封装  -->
+    <resultMap id="empResultMap" type="com.javaweb.departmentmanage.pojo.Emp">
+        <id column="id" property="id" />
+<!--    前面是表中的字段名，后面是pojo中的属性名，用于封装结果    -->
+<!--    普通属性使用result标签进行封装    -->
+        <result column="username" property="username" />
+        <result column="password" property="password" />
+        <result column="name" property="name" />
+        <result column="gender" property="gender" />
+        <result column="image" property="image" />
+        <result column="entry_date" property="entryDate" />
+        <result column="dept_id" property="deptId" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="phone" property="phone" />
+        <result column="job" property="job" />
+        <result column="salary" property="salary" />
+<!--    封装工作经历信息    -->
+<!--    collection标签用于封装集合对象，ofType属性指定集合对象的元素类型 -->
+        <collection property="exprList" ofType="com.javaweb.departmentmanage.pojo.EmpExpr">
+            <id column="exId" property="id" />
+            <!-- 直接复用主表的 id 作为子表的 empId（如果 EmpExpr 类中有 empId 属性的话） -->
+            <result column="id" property="empId" />
+            <result column="exBegin" property="begin" />
+            <result column="exEnd" property="end" />
+            <result column="exJob" property="job" />
+            <result column="exCompany" property="company" />
+        </collection>
+
+    </resultMap>
+
+<!-- 使用动态sql语句来修改员工基本信息 -->
+    <update id="updateById">
+        update emp
+        <!--   set标签可以自动删除多余的逗号   -->
+        <set>
+            <if test="username != null and username != ''">
+            username = #{username},
+            </if>
+            <if test="password != null and password != ''">
+            password = #{password},
+            </if>
+            <if test="name != null and name != ''">
+            name = #{name},
+            </if>
+            <if test="gender != null">
+            gender = #{gender},
+            </if>
+            <if test="phone != null and phone != ''">
+            phone = #{phone},
+            </if>
+            <!--   integer类型不可能为''，所以这里不需要判断   -->
+            <if test="job != null">
+            job = #{job},
+            </if>
+            <if test="salary != null">
+            salary = #{salary},
+            </if>
+            <if test="image != null and image != ''">
+            image = #{image},
+            </if>
+            <if test="entryDate != null">
+            entry_date = #{entryDate},
+            </if>
+<!--   integer类型不可能为''，所以这里不需要判断   -->
+            <if test="deptId != null">
+            dept_id = #{deptId},
+            </if>
+            <if test="updateTime != null">
+            update_time = #{updateTime},
+            </if>
+        </set>
+
+        where id = #{id}
+    </update>
+
+
+    <!-- 统计员工信息 -->
+    <!-- 员工职位统计 -->
+    <!-- 没有装有positon和quantity字段的表，因此这里直接使用自动映射为map即可，
+     不需要进行手动封装为resultMap
+     什么时候才需要手动封装为resultMap：
+     一对多查询、一对一查询等复杂查询时，或者是查询字段跟表中字段大量不一致时 -->
+    <select id="countJobData" resultType="map">
+        select
+        (case
+        when job = 1 then '班主任'
+        when job = 2 then '讲师'
+        when job = 3 then '学工主管'
+        when job = 4 then '教研主管'
+        when job = 5 then '咨询师'
+        else '其他' end ) position,
+        count(*)  quantity
+        from emp group by job
+        order by quantity
+    </select>
+
+    <!-- 员工性别统计 -->
+    <select id="countGenderData" resultType="map">
+        select
+<!--   除了case when语句外，还是可以使用if语句来进行流程控制  -->
+            if(gender = 1 ,'男性员工','女性员工') name,
+<!--  注意：在echarts饼状图中，严格要求key的名称为name   -->
+            count(*) value
+        from emp group by gender
+    </select>
+
+</mapper>

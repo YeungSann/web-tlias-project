@@ -1,0 +1,15 @@
+com\javaweb\departmentmanage\pojo\Student.class
+com\javaweb\departmentmanage\pojo\Dept.class
+com\javaweb\departmentmanage\pojo\LoginDTO.class
+com\javaweb\departmentmanage\pojo\ClazzQueryParam.class
+com\javaweb\departmentmanage\pojo\Emp.class
+com\javaweb\departmentmanage\pojo\JobOption.class
+com\javaweb\departmentmanage\pojo\Result.class
+com\javaweb\departmentmanage\pojo\ClazzCountOption.class
+com\javaweb\departmentmanage\pojo\Clazz.class
+com\javaweb\departmentmanage\pojo\StudentQueryParam.class
+com\javaweb\departmentmanage\pojo\PageResult.class
+com\javaweb\departmentmanage\pojo\EmpQueryParam.class
+com\javaweb\departmentmanage\pojo\EmpExpr.class
+com\javaweb\departmentmanage\pojo\Logger.class
+com\javaweb\departmentmanage\pojo\LoginInfo.class

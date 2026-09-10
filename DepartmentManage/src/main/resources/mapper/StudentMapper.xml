@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.javaweb.departmentmanage.mapper.StudentMapper">
+    <!--    根据ids批量删除学员 -->
+    <delete id="deleteById">
+        delete from student where id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+    <!--    查询总记录数 -->
+    <select id="getAllLines" resultType="java.lang.Long">
+        select count(*) from student s left join clazz c on s.clazz_id=c.id
+        <where>
+            <if test="param.name != null and param.name != ''">
+                and s.name like concat('%', #{param.name}, '%')
+            </if>
+            <if test="param.degree != null and param.degree != ''">
+                and s.degree in (#{param.degree})
+            </if>
+            <if test="param.clazzId != null">
+                and s.clazz_id = #{param.clazzId}
+            </if>
+        </where>
+    </select>
+
+    <!--    带条件的分页查询 -->
+    <select id="page" resultType="com.javaweb.departmentmanage.pojo.Student">
+        select
+        s.*
+        from student s left join clazz c on s.clazz_id=c.id
+        <where>
+            <if test="param.name != null and param.name != ''">
+                and s.name like concat('%', #{param.name}, '%')
+            </if>
+            <if test="param.degree != null and param.degree != ''">
+                and s.degree in (#{param.degree})
+            </if>
+            <if test="param.clazzId != null">
+                and s.clazz_id = #{param.clazzId}
+            </if>
+        </where>
+        order by s.update_time desc
+        limit #{start},#{pageSize}
+    </select>
+
+    <!--    统计学历分布 -->
+    <select id="countDegreeData" resultType="map">
+        select case
+        when degree = 1 then '初中'
+        when degree = 2 then '高中'
+        when degree = 3 then '大专'
+        when degree = 4 then '本科'
+        when degree = 5 then '硕士'
+        when degree = 6 then '博士'
+        else '其他'
+<!--    在echarts饼图中，key的名称一定是name -->
+        end as name
+        ,count(*) as value
+        from student
+        group by degree
+
+    </select>
+    <select id="countCountData" resultType="map">
+        select c.name as clazzName,
+        count(*) as quantity
+        from clazz c left join student s on c.id=s.clazz_id
+        group by c.id
+        order by quantity
+    </select>
+
+
+    <!-- 使用动态sql修改学员信息 -->
+<!-- id，name，no，gender，phone，idCard，isCollege，address，degree，graduationDate，clazzId，violationCount，violationScore -->
+    <update id="updateStudent">
+        update student
+        <set>
+            <if test="name != null and name != ''">name=#{name},</if>
+            <if test="no != null and no != ''">no=#{no},</if>
+            <if test="gender != null">gender=#{gender},</if>
+            <if test="phone != null and phone != ''">phone=#{phone},</if>
+            <if test="idCard != null and idCard != ''">id_card=#{idCard},</if>
+            <if test="isCollege != null">is_college=#{isCollege},</if>
+            <if test="address != null and address != ''">address=#{address},</if>
+            <if test="degree != null ">degree=#{degree},</if>
+            <if test="graduationDate != null ">graduation_date=#{graduationDate},</if>
+            <if test="clazzId != null">clazz_id=#{clazzId},</if>
+            <if test="violationCount != null ">violation_count=#{violationCount},</if>
+            <if test="violationScore != null ">violation_score=#{violationScore},</if>
+            <if test="createTime != null">create_time=#{createTime},</if>
+            <if test="updateTime != null">update_time=#{updateTime},</if>
+        </set>
+        where id=#{id}
+    </update>
+
+
+</mapper>
