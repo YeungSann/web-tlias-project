@@ -15,6 +15,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,161 +24,157 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// emp的service实现类，用来实现empService接口中的方法
+// EmpのService実装クラス：EmpServiceインターフェースで定義されたメソッドを実装
 @Slf4j
 @Service
 public class EmpServiceImpl implements EmpService {
-    // 注入empMapper对象，用来操作emp表
+    // empMapperオブジェクトを注入し、empテーブルを操作
     @Autowired
     private EmpMapper empMapper;
 
-    // 注入员工经历的mapper对象
+    // 職歴情報のMapperオブジェクトを注入
     @Autowired
     private EmpExprMapper empExprMapper;
 
     /*
-    // 分页查询方法
+    // ページング検索メソッド
     @Override
     public PageResult<Emp> getListPage(Integer page, Integer pageSize) {
 
-        // 调用empMapper对象的getTotal方法查询总记录数
+        // empMapperの getTotal メソッドを呼び出して総レコード数を取得
         long total = empMapper.getTotal();
 
-        // 调用empMapper对象的findPage方法查询结果列表
-        // 调用之前需要根据 起始索引 = (page - 1) * pageSize 计算出起始索引
+        // empMapperの findPage メソッドを呼び出して結果リストを取得
+        // 呼び出し前に 開始インデックス = (page - 1) * pageSize により位置を算出
         Integer start = (page - 1) * pageSize;
         List<Emp> rows = empMapper.findPage(start, pageSize);
 
-        // 把total和 list封装为pageResult对象，返回
+        // total と list を PageResult オブジェクトにカプセル化して返却
         PageResult<Emp> pageResult = new PageResult<>(total, rows);
         return pageResult;
 
 
-        // 设置分页参数
-        // 这里传的是当前页码和每页记录数两个参数
+        // ページングパラメータを設定
+        // ここでは現在のページ番号と1ページあたりの件数の2つの引数を渡す
         PageHelper.startPage(page, pageSize);
 
-        // 调用mapper接口方法
+        // Mapperインターフェースのメソッドを呼び出す
         List<Emp> rows = empMapper.list();
-        // 注意：pagehelper仅能对第一个查询方法进行分页，后续的查询方法不会进行分页
-        // 也就是即使再调用empMapper对象的findPage方法，也不会进行分页
+        // 注意：PageHelperは最初のクエリメソッドに対してのみページングを適用し、それ以降のクエリには適用されない
+        // つまり、再度 empMapper の findPage メソッドを呼び出してもページング処理は行われない
 
-        // 把rows列表强制转换成page对象，page就直接是列表对象了
+        // rowsリストを Page オブジェクトにキャストする（PageはListを継承している）
         Page<Emp> pages = (Page<Emp>) rows;
 
-        // 解析结果并封装结果返回
-        // 最终还是要想controller层返回出总记录数和当前页数据列表
+        // 結果を解析・カプセル化して返却
+        // 最終的にController層に対して総レコード数と該当ページのデータリストを返却する
         return new PageResult<>(pages.getTotal(), pages.getResult());
     }
 
-    // 条件分页查询方法
-    // 调用mapper中的list2方法
+    // 条件付きページング検索メソッド
+    // Mapperの list2 メソッドを呼び出す
     @Override
     public PageResult<Emp> listPage2(Integer page, Integer pageSize,
                                      String name, Integer gender,
                                      LocalDate begin, LocalDate end) {
-        // 设置分页参数
-        // 这里传的是当前页码和每页记录数两个参数
+        // ページングパラメータを設定
+        // 現在のページ番号と1ページあたりの件数を指定
         PageHelper.startPage(page, pageSize);
 
-        // 调用mapper接口方法
-        // 并且，继续把新增的四个参数往下传递
+        // Mapperインターフェースのメソッドを呼び出し、追加された4つの条件パラメータを渡す
         List<Emp> rows = empMapper.list2(name, gender, begin, end);
-        // 注意：pagehelper仅能对第一个查询方法进行分页，后续的查询方法不会进行分页
-        // 也就是即使再调用empMapper对象的findPage方法，也不会进行分页
+        // 注意：PageHelperは最初のクエリメソッドに対してのみページングを適用する
 
-        // 把rows列表强制转换成page对象，page就直接是列表对象了
+        // rowsリストを Page オブジェクトにキャスト
         Page<Emp> pages = (Page<Emp>) rows;
 
-        // 解析结果并封装结果返回
-        // 最终还是要想controller层返回出总记录数和当前页数据列表
+        // 結果を解析・カプセル化して返却
         return new PageResult<>(pages.getTotal(), pages.getResult());
     }
     */
 
     @Override
     public PageResult<Emp> listPage3(EmpQueryParam empQueryParam) {
-        // 设置分页参数
+        // ページングパラメータを設定
         PageHelper.startPage(empQueryParam.getPage(), empQueryParam.getPageSize());
 
-        // 调用mapper接口方法
+        // Mapperインターフェースのメソッドを呼び出し
         List<Emp> rows = empMapper.list3(empQueryParam);
         Page<Emp> pages = (Page<Emp>) rows;
 
-        // 解析结果并封装结果返回
+        // 結果を解析・カプセル化して返却
         return new PageResult<>(pages.getTotal(), pages.getResult());
     }
 
-    // 在方法之上开启事务，保证这里面的两个调用，要么同时成功，要么同时失败
-    // 增加rollbackFor属性，指定指定异常类，回滚事务
-    @Transactional(rollbackFor = Exception.class) // 自动完成开启事务，提交事务，回滚事务
+    // メソッドにトランザクション（@Transactional）を適用し、内部の2つのデータベース操作が全成功または全失敗（ロールバック）することを保証
+    // rollbackFor 属性を追加し、全例外（Exception）でトランザクションがロールバックされるよう指定
+    @Transactional(rollbackFor = Exception.class) // トランザクションの開始、コミット、ロールバックを自動制御
     @Override
     public void save(Emp emp)  {
-        // 调用empMapper对象的insert方法保存员工基本信息
-        // 调用之前，先把更新时间设置为当前时间
+        // empMapperの saveEmp メソッドを呼び出して社員基本情報を保存
+        // 呼び出し前に、更新日時を現在日時に設定
         emp.setUpdateTime(LocalDateTime.now());
-        // 调用之前，先把创建时间设置为当前时间
+        // 呼び出し前に、作成日時を現在日時に設定
         emp.setCreateTime(LocalDateTime.now());
         empMapper.saveEmp(emp);
 
-        // 手动抛出一个异常
+        // 手動で例外を発生させるテストコード
         //if (true){
-            //throw new Exception("出错啦~ ~");
+        //throw new Exception("出错啦~ ~");
         //}
 
-        // 先获取员工的工作经历列表
+        // まず社員の職歴リスト（exprList）を取得
         List<EmpExpr> exprList = emp.getExprList();
-        // 工作经历的可能分析，可能完全没有工作经历，也可能有工作经历
-        // 所以，这里需要判断一下，是否有工作经历
+        // 職歴データが存在しない場合と存在する場合があるため、NULL/空判定を実施
 
         if (!CollectionUtils.isEmpty(exprList)) {
-            // 有工作经历
-            // 遍历集合，获取emp的id，同时直接赋值给empExpr对象的empId属性
+            // 職歴データが存在する場合
+            // コレクションをループ処理し、生成された社員ID（emp.getId()）を取得して各 empExpr オブジェクトの empId プロパティに設定
             exprList.forEach(item -> {
                 item.setEmpId(emp.getId());
             });
 
-            // 调用empExprMapper对象的insertBatch方法批量保存员工的工作经历信息
+            // empExprMapperの saveBatchExpr メソッドを呼び出し、職歴情報を一括保存（バッチ挿入）
             empExprMapper.saveBatchExpr(exprList);
         }
     }
 
-    // service中调用了两个mapper接口，因此必须保证这两个调用，要么同时成功，要么同时失败
-    @Transactional(rollbackFor = Exception.class) // 自动完成开启事务，提交事务，回滚事务
+    // Service内で2つのMapperインターフェースを呼び出しているため、原子性（全成功または全失敗）を保証
+    @Transactional(rollbackFor = Exception.class) // トランザクションを自動制御
     @Override
     public void deleteById(List<Integer> ids) {
-        // 调用empMapper对象的delete方法删除员工基本信息
+        // empMapperの deleteByIds メソッドを呼び出し、社員基本情報を削除
         empMapper.deleteByIds(ids);
-        // 调用empExprMapper对象的deleteByEmpIds方法删除员工表达式信息
+        // empExprMapperの deleteByEmpIds メソッドを呼び出し、該当社員の職歴（式/関連）情報を削除
         empExprMapper.deleteByEmpIds(ids);
     }
 
     @Override
     public Emp getById(Integer id) {
-        // 直接调用empMapper接口，通过外连接查询把员工信息和工作经历信息查询出来
+        // empMapperインターフェースを直接呼び出し、外部結合（OUTER JOIN）により社員基本情報と職歴情報をまとめて取得
         return empMapper.selectById(id);
     }
 
-    // 添加事务，保证方法中的两个调用，要么同时成功，要么同时失败
-    @Transactional(rollbackFor = Exception.class) // 自动完成开启事务，提交事务，回滚事务
+    // トランザクションを追加し、メソッド内の2つの呼び出しが全成功または全失敗することを保証
+    @Transactional(rollbackFor = Exception.class) // トランザクションを自動制御
     @Override
     public void updateById(Emp emp) {
-        // 先调用empMapper对象的updateById方法修改员工基本信息
-        // 先更新时间设置为当前时间
+        // まず empMapper の updateById メソッドを呼び出して社員基本情報を更新
+        // 更新日時を現在日時に設定
         emp.setUpdateTime(LocalDateTime.now());
         empMapper.updateById(emp);
 
-        // 调用empExprMapper对象的deleteByEmpId方法删除员工表达式信息
-        // 直接复用上面的批量删除方法，只不过需要我们把emp.getId()转换成集合
+        // empExprMapper の deleteByEmpIds メソッドを呼び出して該当社員の既存職歴情報を一括削除
+        // 既存の deleteByEmpIds メソッドを再利用するため、emp.getId() をリスト構造に変換して渡す
         empExprMapper.deleteByEmpIds(Arrays.asList(emp.getId()));
-        // 再添加这个员工的工作经历信息
+        // 再度この社員の新しい職歴情報を追加
         List<EmpExpr> exprList = emp.getExprList();
-        // 判断是否有工作经历，如果有，才需要添加
+        // 職歴情報が存在するか判定し、存在する場合のみ追加処理を実行
         if (!CollectionUtils.isEmpty(exprList)) {
-            // 拿到员工的id
+            // 社員IDを取得して設定
             exprList.forEach(item ->item.setEmpId(emp.getId()));
 
-            // 调用empExprMapper对象的insertBatch方法批量保存员工的工作经历信息
+            // empExprMapper の saveBatchExpr メソッドを呼び出して職歴情報を一括保存
             empExprMapper.saveBatchExpr(exprList);
         }
     }
@@ -187,28 +184,51 @@ public class EmpServiceImpl implements EmpService {
         return empMapper.listMaster();
     }
 
-     @Override
+    @Override
     public LoginInfo login(LoginDTO loginDTO) {
-        // 调用底层mapper获取对应的员工信息
+        // 最下層のMapperを呼び出し、該当する社員情報を取得
         Emp emp = empMapper.selectByUsernameAndPassword(loginDTO.getUsername(), loginDTO.getPassword());
 
-        // 业务逻辑校验：如果查询到的用户信息为空，说明用户名或密码错误
+        // ビジネスロジック検証：取得したユーザー情報がNULLの場合、ユーザー名またはパスワードが誤っている
         if (emp == null) {
-            // 没有查询到，说明用户名不存在
+            // データが取得できない場合（ユーザー名が存在しない、またはパスワード不一致）
             throw new BusinessException("用户名或密码错误");
         }
-        // 非空，把查询到的用户信息封装到loginInfo中：id，username，name，token
+        // 非NULLの場合、取得したユーザー情報を LoginInfo にカプセル化：id, username, name, token
         LoginInfo loginInfo = new LoginInfo();
         loginInfo.setId(emp.getId());
         loginInfo.setUsername(emp.getUsername());
         loginInfo.setName(emp.getName());
-        // 调用jwtutils工具类，生成令牌
-         Map<String,Object> claim = new HashMap<>();
-         claim.put("id",emp.getId());
-         claim.put("username",emp.getUsername());
+        // JwtUtils ユーティリティクラスを呼び出し、JWTトークンを生成
+        Map<String,Object> claim = new HashMap<>();
+        claim.put("id",emp.getId());
+        claim.put("username",emp.getUsername());
         loginInfo.setToken(JwtUtils.generateToken(claim));
-        // 把loginInfo返回给控制器
+        // コントローラーへ loginInfo を返却
         return loginInfo;
+    }
+
+    @Override
+    public void updatePassword(EmpPasswordParam param) {
+        // 1. パラメータの検証（ID、新しいパスワード、確認用パスワードの非空チェック）
+        if (param == null || param.getId() == null) {
+            throw new IllegalArgumentException("ユーザーIDを指定してください。");
+        }
+
+        String newPassword = param.getNewPassword();
+        String rePassword = param.getRePassword();
+
+        if (!StringUtils.hasText(newPassword) || !StringUtils.hasText(rePassword)) {
+            throw new IllegalArgumentException("新しいパスワードおよび確認用パスワードを入力してください。");
+        }
+
+        // 2. 新しいパスワードと確認用パスワードの一致チェック
+        if (!newPassword.equals(rePassword)) {
+            throw new IllegalArgumentException("新しいパスワードと確認用パスワードが一致しません。");
+        }
+
+        // 3. 検証通過後、Mapper を呼び出してパスワードを更新
+        empMapper.updatePassword(param.getId(), newPassword);
     }
 
 

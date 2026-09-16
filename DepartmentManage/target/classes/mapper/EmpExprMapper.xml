@@ -3,26 +3,27 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.javaweb.departmentmanage.mapper.EmpExprMapper">
+    <!-- 社員職歴情報の一括登録（バッチ挿入） -->
     <insert id="saveBatchExpr" >
         insert into emp_expr (emp_id,begin,end,company,job) values
-        <!--   collection属性指定我们要遍历的集合对象
-             item：集合遍历出来的元素
-             separator：每个元素之间的分隔符
-              open：遍历开始前的括号
-               close：遍历结束后的括号 -->
+        <!--   collection属性：反復処理（ループ）対象のコレクションオブジェクトを指定
+             item：コレクションから取り出された各要素の変数名
+             separator：各要素間に挿入する区切り文字
+              open：反復処理開始時に出力する文字（開始括弧）
+               close：反復処理終了時に出力する文字（終了括弧） -->
         <foreach collection="exprList" item="expr" separator=",">
             (#{expr.empId},#{expr.begin},#{expr.end},#{expr.company},#{expr.job})
         </foreach>
     </insert>
 
-<!--  delete * from emp_expr where emp_id in (1,2,3) 动态sql批量删除  -->
+    <!--  delete from emp_expr where emp_id in (1,2,3) 動的SQLによる一括削除  -->
     <delete id="deleteByEmpIds">
         delete from emp_expr where emp_id in
-        <!--   遍历empIds集合，将每个元素转换为字符串，用逗号隔开 -->
-<!--    使用emp_expr表中的emp_id字段，来删除员工表达式信息，而不是id字段
-    因为emp_id字段是emp表中的id字段的逻辑外键关系，所以我们可以直接使用emp_id字段来删除员工表达式信息 -->
+        <!--   empIdsコレクションを反復処理し、各要素をカンマ区切りの文字列に変換 -->
+        <!--    emp_expr テーブルの主キー（id）ではなく emp_id フィールドを使用して社員職歴情報を削除します。
+            emp_id フィールドは emp テーブルの id フィールドに対する論理外鍵関係となっているため、emp_id を直接指定して関連する職歴情報を一括削除可能です。 -->
         <foreach collection="empIds" item="empId" open="(" close=")" separator=",">
-                #{empId}
+            #{empId}
         </foreach>
     </delete>
 </mapper>

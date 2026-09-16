@@ -3,14 +3,14 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.javaweb.departmentmanage.mapper.StudentMapper">
-    <!--    根据ids批量删除学员 -->
+    <!--    ID一覧に基づく受講生情報の一括削除 -->
     <delete id="deleteById">
         delete from student where id in
         <foreach collection="ids" item="id" open="(" close=")" separator=",">
             #{id}
         </foreach>
     </delete>
-    <!--    查询总记录数 -->
+    <!--    総レコード件数の照会（条件付き） -->
     <select id="getAllLines" resultType="java.lang.Long">
         select count(*) from student s left join clazz c on s.clazz_id=c.id
         <where>
@@ -26,7 +26,7 @@
         </where>
     </select>
 
-    <!--    带条件的分页查询 -->
+    <!--    条件付きページング照会 -->
     <select id="page" resultType="com.javaweb.departmentmanage.pojo.Student">
         select
         s.*
@@ -46,23 +46,24 @@
         limit #{start},#{pageSize}
     </select>
 
-    <!--    统计学历分布 -->
+    <!--    学歴分布の集計（ECharts 用データ取得） -->
     <select id="countDegreeData" resultType="map">
         select case
-        when degree = 1 then '初中'
-        when degree = 2 then '高中'
-        when degree = 3 then '大专'
-        when degree = 4 then '本科'
-        when degree = 5 then '硕士'
+        when degree = 1 then '高卒'
+        when degree = 2 then '専門卒'
+        when degree = 3 then '短大卒'
+        when degree = 4 then '大卒'
+        when degree = 5 then '修士'
         when degree = 6 then '博士'
-        else '其他'
-<!--    在echarts饼图中，key的名称一定是name -->
+        else 'その他'
+        <!--    EChartsの円グラフ（パイチャート）では、キー名は必ず 'name' に指定する必要があります -->
         end as name
         ,count(*) as value
         from student
         group by degree
 
     </select>
+    <!-- クラスごとの受講生人数の集計 -->
     <select id="countCountData" resultType="map">
         select c.name as clazzName,
         count(*) as quantity
@@ -72,8 +73,8 @@
     </select>
 
 
-    <!-- 使用动态sql修改学员信息 -->
-<!-- id，name，no，gender，phone，idCard，isCollege，address，degree，graduationDate，clazzId，violationCount，violationScore -->
+    <!-- 動的SQLを使用した受講生情報の更新 -->
+    <!-- id，name，no，gender，phone，idCard，isCollege，address，degree，graduationDate，clazzId，violationCount，violationScore -->
     <update id="updateStudent">
         update student
         <set>

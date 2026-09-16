@@ -14,49 +14,49 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @RestController
 public class UploadController {
-    // 注入AliyunOSSOperator类
+    // AliyunOSSOperator クラスを注入（DI）
     @Autowired
     private AliyunOSSOperator ossyunOSSOperator;
     /*
-    基于本地存储的文件上传
+    ローカルストレージに基づくファイルアップロード処理
 
     @PostMapping("/upload")
-    // 方法形参中声明前端from表单中的变量，文件必须使用multipartFile类型
+    // メソッドの仮引数にフロントエンドForm表单の変数を宣言。ファイルはMultipartFile型を使用する必要がある
     public Result upload(@RequestParam("name") String name,
                          @RequestParam("age") Integer age,
                          @RequestParam("image") MultipartFile image) throws IOException {
-        // 测试一下能否接收到参数
+        // パラメータが正しく受信できているかテストログを出力
         log.info("name: {}, age: {}, image: {}", name, age, image);
 
-        // 调用MultipartFile的getOriginalFilename方法，获取原始文件名
+        // MultipartFile の getOriginalFilename メソッドを呼び出し、元のファイル名を取得
         String originalFileName = image.getOriginalFilename();
-        // 随机生成uuid，并去掉中间的-
+        // UUIDをランダム生成し、途中のハイフン（-）を削除
         String randomStr = UUID.randomUUID().toString().replaceAll("-", "");
-        // 获取原始文件扩展名
+        // 元のファイルの拡張子を取得
         String extension = originalFileName.substring((originalFileName.lastIndexOf(".")));
-        // 拼接uuid和后缀名，作为新的文件名
+        // UUIDと拡張子を結合し、新しいファイル名を作成
         String newFileName = randomStr + extension;
 
-        // 保存文件
-        // 调用MultipartFile的transferTo方法，将文件保存到指定路径
+        // ファイルを保存
+        // MultipartFile の transferTo メソッドを呼び出し、指定したローカルパスにファイルを保存
         image.transferTo(new File("D:/images/" + newFileName));
 
-        //返回结果
+        // 成功結果を返却
         return Result.success();
     }
      */
 
-    // 基于阿里云OSS的文件上传
-    // 调用AliyunOSSOperator类的upload方法
+    // アリババクラウドOSS（Aliyun OSS）に基づくファイルアップロード
+    // AliyunOSSOperator クラスの upload メソッドを呼び出す
     @PostMapping("/upload")
     public Result upload(@RequestParam("image") MultipartFile image) throws Exception {
-        log.info("文件上传:{}", image);
+        log.info("ファイルアップロード:{}", image);
 
-        // 调用AliyunOSSOperator类的upload方法，上传文件到OSS
+        // AliyunOSSOperator クラスの upload メソッドを呼び出し、ファイルをOSSへアップロード
         String url = ossyunOSSOperator.upload(image);
 
-        log.info("文件上传成功url:{}", url);
-        // 返回结果
+        log.info("ファイルアップロード成功 URL:{}", url);
+        // 成功結果（アクセスURL付き）を返却
         return Result.success(url);
     }
 

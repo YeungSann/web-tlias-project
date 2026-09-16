@@ -20,21 +20,21 @@ public class ClazzServiceImpl implements ClazzService {
 
     @Override
     public PageResult<Clazz> listPage(ClazzQueryParam queryParam) {
-        // 这里不使用pagehelper插件，直接调用mapper层的findAll方法，获取总记录数
+        // PageHelperプラグインを使用せず、Mapper層の findAll メソッドを直接呼び出して総レコード数を取得
         long total = clazzMapper.findAll(queryParam);
-        // 起始索引 = (page - 1) * pageSize 计算出起始索引
+        // 開始インデックス = (page - 1) * pageSize により開始位置を計算
         Integer start = (queryParam.getPage() - 1) * queryParam.getPageSize();
-        // 计算总行数
+        // ページングデータ（該当ページの全件リスト）を取得
         List<Clazz> rows = clazzMapper.findPage(queryParam, start, queryParam.getPageSize());
 
-        // 3. 获取当前日期，动态计算班级状态 status
+        // 3. 現在の日付を取得し、クラスのステータス（status）を動的に計算
         LocalDate now = LocalDate.now();
         if (!CollectionUtils.isEmpty(rows)) {
             rows.forEach(clazz -> {
                 LocalDate beginDate = clazz.getBeginDate();
                 LocalDate endDate = clazz.getEndDate();
 
-                // 规则校验
+                // ルール判定
                 if (beginDate != null && now.isBefore(beginDate)) {
                     clazz.setStatus("未开班");
                 } else if (endDate != null && now.isAfter(endDate)) {
@@ -44,27 +44,27 @@ public class ClazzServiceImpl implements ClazzService {
                 }
             });
         }
-        // 把total和rows封装为pageResult对象，返回
+        // total と rows を PageResult オブジェクトにカプセル化して返却
         return new PageResult<>(total, rows);
     }
 
-    // 定义一个根据id删除班级的方法，直接调用mapper层的deleteById方法删除
+    // IDによるクラス削除メソッドを定義。Mapper層の deleteById メソッドを直接呼び出して削除
     @Override
     public void deleteById(Integer id) {
         clazzMapper.deleteById(id);
     }
 
-    // 定义一个添加班级的方法，直接调用mapper层的addClazz方法添加
+    // クラス追加メソッドを定義。Mapper層の addClazz メソッドを直接呼び出して追加
     @Override
     public void addClazz(Clazz clazz) {
-        // 调用mapper层的addClazz方法添加班级
-        // 先设置创建时间和更新时间为now
+        // Mapper層の addClazz メソッドを呼び出してクラスを追加
+        // 事前に作成日時および更新日時を現在日時に設定
         clazz.setCreateTime(LocalDateTime.now());
         clazz.setUpdateTime(LocalDateTime.now());
         clazzMapper.addClazz(clazz);
     }
 
-    // 定义一个根据id查询班级的方法，直接调用mapper层的findById方法查询
+    // IDによるクラス照会メソッドを定義。Mapper層の findById メソッドを直接呼び出して照会
     @Override
     public Clazz findById(Integer id) {
         return clazzMapper.findById(id);
@@ -72,16 +72,16 @@ public class ClazzServiceImpl implements ClazzService {
 
     @Override
     public void updateClazz(Clazz clazz) {
-        // 先设置updateTime为now
+        // 事前に updateTime を現在日時に設定
         clazz.setUpdateTime(LocalDateTime.now());
-        // 调用mapper层的updateClazz方法更新班级
+        // Mapper層の updateClazz メソッドを呼び出してクラス情報を更新
         clazzMapper.updateClazz(clazz);
     }
 
-    // 定义一个查询所有班级的方法，直接调用mapper层的findAll方法查询
+    // 全クラス取得メソッドを定義。Mapper層の getClazzs メソッドを直接呼び出して照会
     @Override
     public List<Clazz> list() {
-        // 调用mapper层的findAll方法查询所有班级，返回为clazz的list
+        // Mapper層の getClazzs メソッドを呼び出して全クラスを取得し、ClazzのListとして返却
         return clazzMapper.getClazzs();
     }
 }

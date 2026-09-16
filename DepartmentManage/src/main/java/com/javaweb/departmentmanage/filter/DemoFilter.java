@@ -7,30 +7,30 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 
 @Slf4j
-// @WebFilter("/*")// /* 表示拦截所有请求
+//@WebFilter("/*")// /* はすべてのリクエストをインターセプトすることを意味する
 public class DemoFilter implements Filter {
-    // 初始化方法，只在服务器启动时调用一次
+    // 初期化メソッド（Webサーバー起動時に1度だけ呼び出される）
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        // 记录日志，初始化过滤器
-        log.info("初始化过滤器");
+        // ログ記録：フィルタの初期化
+        log.info("フィルタの初期化");
     }
 
-    // 拦截到请求之后，会调用本方法，用来处理请求
+    // リクエストをインターセプトした際に呼び出され、リクエスト処理を実行するメソッド
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        // 记录日志，拦截到请求
-        log.info("拦截到请求");
+        // ログ記録：リクエストをインターセプト
+        log.info("リクエストをインターセプトしました");
 
-        // 放行，只能是调用filterChain中的doFilter方法
-        // 把本方法中的形参往下传递即可
+        // 後続処理（次のフィルタまたはサーブレット）へのパス（放行）。filterChainの doFilter メソッドを呼び出すことで実行
+        // 本メソッドの仮引数をそのまま次へ渡す
         filterChain.doFilter(servletRequest, servletResponse);
     }
 
-    // 销毁方法，只在服务器关闭时调用一次
+    // 破棄メソッド（Webサーバー停止・シャットダウン時に1度だけ呼び出される）
     @Override
     public void destroy() {
-        // 记录日志，销毁过滤器
-        log.info("销毁过滤器");
+        // ログ記録：フィルタの破棄
+        log.info("フィルタの破棄");
     }
 }

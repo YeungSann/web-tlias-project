@@ -12,45 +12,51 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 @Slf4j
-//@Component
+@Component
 public class TokenInterceptor implements HandlerInterceptor {
-    // 先实现三个接口方法
+    // まずインターフェースの3つのメソッドを実装する（ここではpreHandleのみオーバーライド）
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        log.info("拦截到请求");
+        log.info("リクエストが受信されました");
         /*
-        // 先判断uri的请求路径是否是登录接口
+        // まずURIのリクエストパスがログインAPIであるか判定
         if (request.getRequestURI().contains("/login")) {
             log.info("登录接口，放行");
             return true;
         }*/
-        // 获取请求头中的token
+        // リクエストヘッダーからtokenを取得
         String token = request.getHeader("token");
         if (token == null || token.isEmpty()) {
-            log.info("token为空，拒绝访问");
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "用户未登录，拒绝访问！");
+            log.info("tokenが空です，アクセス拒否");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "ユーザー未ログイン，アクセス拒否！");
             return false;
         }
-        // 调用jwtutils工具类对token进行解析
+        // JwtUtilsユーティリティクラスを呼び出してtokenを解析・検証
         try {
-            // 解析token，获取json中的数据
+            // tokenを解析し、JSON内のクレーム（Claims）データを取得
             Claims claims = JwtUtils.parseToken(token);
 
-            // 从json中获取员工id，并通过BaseContext类中的set方法，保存到threadlocal中
+            // JSONデータから社員IDを取得し、BaseContextクラスのsetメソッドを介してThreadLocalに保存する
             Integer id = (Integer) claims.get("id");
             BaseContext.setCurrentEmpId(id);
         } catch (Exception e) {
-            log.info("令牌解析失败");
+            log.info("トークンの解析に失敗しました");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
 
-        // 令牌解析成功，放行请求
-        log.info("令牌解析成功，放行请求");
+        // トークンの解析に成功、リクエストをパス（許可）する
+        log.info("トークンの解析に成功しました，アクセスされました");
 
-        // 放行之后，释放threadlocal中的资源
-        BaseContext.clearCurrentEmpId();
+        // リクエスト許可後、ThreadLocal内のリソース（メモリ）を解放する
+        // BaseContext.clearCurrentEmpId();
+        // IDを保存するため、コメントアウトする
         return true;
     }
 
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        // リクエストが完了後、ThreadLocal内のリソース（メモリ）を解放する
+        BaseContext.clearCurrentEmpId();
+    }
 }

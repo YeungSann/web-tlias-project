@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- 声明父工程是tlias-parent工程 -->
+    <!-- 親プロジェクトとして tlias-parent プロジェクトを宣言 -->
     <parent>
         <groupId>com.tlias</groupId>
         <artifactId>tlias-parent</artifactId>
@@ -21,19 +21,19 @@
     </properties>
 
     <dependencies>
-        <!-- 导入jwt依赖 -->
+        <!-- JWT 依存関係を導入 -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
         </dependency>
 
-        <!-- 导入阿里云OSS依赖 -->
+        <!-- アリババクラウド OSS 依存関係を導入 -->
         <dependency>
             <groupId>com.aliyun.oss</groupId>
             <artifactId>aliyun-sdk-oss</artifactId>
         </dependency>
 
-        <!--  为了使用阿里云，继续引入jaxb依赖 -->
+        <!--  アリババクラウド利用のため、引き続き JAXB 依存関係を導入 -->
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
@@ -42,13 +42,13 @@
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
         </dependency>
-        <!-- no more than 2.3.3-->
+        <!-- 2.3.3 以下であること -->
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
         </dependency>
 
-        <!-- 补上 Web 依赖：提供 MultipartFile 等 API 支撑 -->
+        <!-- Web 依存関係を追加：MultipartFile などの API サポートを提供 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>

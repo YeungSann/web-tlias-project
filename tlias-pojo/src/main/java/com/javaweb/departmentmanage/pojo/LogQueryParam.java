@@ -10,12 +10,12 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LogQueryParam {
-    private Integer page = 1;
-    private Integer pageSize = 10;
-    private String operatorName;
-    private String className;
+    private Integer page = 1; // 現在のページ番号（デフォルト値：1）
+    private Integer pageSize = 10; // 1ページあたりの表示件数（デフォルト値：10）
+    private String operatorName; // 操作者名（検索キーワード）
+    private String className; // クラス名（完全修飾クラス名での検索キーワード）
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate beginTime;
+    private LocalDate beginTime; // 操作日時検索範囲：開始日
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate endTime;
+    private LocalDate endTime; // 操作日時検索範囲：終了日
 }

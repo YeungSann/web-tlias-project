@@ -8,10 +8,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.server.servlet.context.ServletComponentScan;
 import org.springframework.context.annotation.Bean;
 
-// 增加servlet扫描器注解
+// Servletスキャナーのアノテーションを追加（Filter, Servlet等のコンポーネントをスキャン）
 @ServletComponentScan
 @SpringBootApplication
-// 当只使用mapper注解而无法扫描到mapper接口时，需要使用@Scan注解指定扫描的包
+// @MapperアノテーションのみでMapperインターフェースがスキャンできない場合、@MapperScanでスキャン対象パッケージを指定する必要がある
 @MapperScan("com.javaweb.departmentmanage.mapper")
 public class DepartmentManageApplication {
 

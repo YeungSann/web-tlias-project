@@ -16,59 +16,59 @@ public class StudentServiceImpl implements StudentService {
     @Autowired
     private StudentMapper studentMapper;
 
-    // 带条件的分页查询方法
+    // 検索条件付きページング検索メソッド
     @Override
     public PageResult<Student> page(StudentQueryParam param) {
-        // 先获取总记录数
+        // まず総レコード数を取得
         long total = studentMapper.getAllLines(param);
 
-        // 设置分页参数
+        // ページングパラメータ（開始インデックス）を設定
         Integer start = (param.getPage()-1)*param.getPageSize();
-        // 执行查询--->把查询的结果封装到list中
+        // 検索を実行--->検索結果を List にカプセル化
         List<Student> list = studentMapper.page(param,start,param.getPageSize());
 
-        // 把total和list封装到PageResult对象中
-        // 返回分页结果
+        // total と list を PageResult オブジェクトにカプセル化
+        // ページング結果を返却
         return new PageResult<>(total, list);
     }
 
     @Override
     public void deleteById(List<Integer> ids) {
-        // 直接调用底层mapper的deleteById方法，删除学员信息
+        // 最下層 Mapper の deleteById メソッドを直接呼び出し、受講生情報を削除
         studentMapper.deleteById(ids);
     }
 
-    // 添加学员方法
+    // 受講生追加メソッド
     @Override
     public void addStudent(Student student) {
-        // 先设置创建时间和更新时间为now
+        // 事前に作成日時および更新日時を現在日時に設定
         student.setCreateTime(LocalDateTime.now());
         student.setUpdateTime(LocalDateTime.now());
-        // 调用底层mapper的addStudent方法，添加学员信息
+        // 最下層 Mapper の addStudent メソッドを呼び出し、受講生情報を追加
         studentMapper.addStudent(student);
     }
 
-    // 根据id查询学员信息方法
+    // IDによる受講生情報照会メソッド
     @Override
     public Student getById(Integer id) {
-        // 直接调用底层mapper的getById方法，根据学员id查询学员信息
+        // 最下層 Mapper の getById メソッドを直接呼び出し、受講生IDに基づいて受講生情報を照会
         return studentMapper.getById(id);
     }
 
     @Override
     public void updateStudent(Student student) {
-        // 先写好更新时间
+        // 事前に更新日時を設定
         student.setUpdateTime(LocalDateTime.now());
-        // 调用底层mapper的updateStudent方法，修改学员信息
+        // 最下層 Mapper の updateStudent メソッドを呼び出し、受講生情報を更新
         studentMapper.updateStudent(student);
     }
 
     @Override
     public void violation(Integer id, Integer score) {
-        // 现根据学员id查询学员信息
+        // まず受講生IDに基づいて受講生情報を取得
         Student student = studentMapper.getById(id);
 
-        // score和count都是Short包装类，空值时默认null，需要先进行非空判断
+        // score と count は Short 参照型（ラッパークラス）であり、未設定時はデフォルトで null となるため、事前に非空判定（初期化）が必要
         if (student.getViolationCount() == null) {
             student.setViolationCount((short) 0);
         }
@@ -76,12 +76,12 @@ public class StudentServiceImpl implements StudentService {
             student.setViolationScore((short) 0);
         }
 
-        // 前端输入扣分后，更新该学员的违纪次数+1
+        // フロントエンドから減点が入力された後、該当受講生の違反回数を +1 更新
         student.setViolationCount((short) (student.getViolationCount() + 1));
-        // 把学员的扣分更新为原来的分数+输入的分数
+        // 受講生の累積減点スコアを「元のスコア + 入力されたスコア」に更新
         student.setViolationScore((short) (student.getViolationScore() + score));
 
-        // 最后根据学员id更新学员信息
+        // 最後に受講生IDに基づいて受講生情報を更新
         studentMapper.updateStudent(student);
     }
 }

@@ -9,23 +9,23 @@ import java.util.Map;
 
 @Mapper
 public interface StudentMapper {
-    // 查询总记录数
+    // 総レコード数の取得
     long getAllLines(@Param("param") StudentQueryParam param);
 
-    // 分页查询
-    // 查询字段：姓名、学号、班级、性别、手机号、最高学历、违纪次数、违纪扣分、最后操作时间、操作
-    // 把service层定义的start往下传给mapper层
+    // ページング検索
+    // 取得対象フィールド：氏名、学籍番号、所属クラス、性別、携帯番号、最終学歴、規律違反回数、減点数、最終更新日時、操作
+    // Service層で算出された開始位置（start）をMapper層へ渡してクエリを実行
     List<Student> page(@Param("param") StudentQueryParam param,
                        @Param("start") Integer start,
                        @Param("pageSize") Integer pageSize);
 
-    // 根据ids批量删除学员
+    // IDリスト（ids）による受講生の一括削除
     void deleteById(@Param("ids") List<Integer> ids);
 
-    // 添加学员
-    //id，name，no，gender，phone，idCard，isCollege，address，degree，graduationDate，clazzId，violationCount，violationScore
+    // 受講生の追加
+    // id, name, no, gender, phone, idCard, isCollege, address, degree, graduationDate, clazzId, violationCount, violationScore
     @Options(useGeneratedKeys = true, keyProperty = "id")
-    @Insert("insert into student" + 
+    @Insert("insert into student" +
             "(name,no,gender,phone,id_card,is_college,address,degree,graduation_date," +
             "clazz_id,create_time,update_time) " +
             "values(#{name},#{no},#{gender},#{phone},#{idCard},#{isCollege}," +
@@ -33,16 +33,16 @@ public interface StudentMapper {
             "#{createTime},#{updateTime})")
     void addStudent(Student student);
 
-    // 根据id查询学员信息
+    // IDによる受講生情報の取得
     @Select("select * from student where id=#{id}")
     Student getById(Integer id);
 
-    // 使用动态sql修改学员信息
+    // 動的SQLを使用した受講生情報の更新
     void updateStudent(Student student);
 
-    // 统计学员学历分布---》type为map
+    // 受講生の学歴分布の集計---＞戻り値の要素タイプは Map
     List<Map<String, Object>> countDegreeData();
 
-    // 统计班级人数分布---》type为map
+    // クラス別在籍人数の集計---＞戻り値の要素タイプは Map
     List<Map<String, Object>> countCountData();
 }

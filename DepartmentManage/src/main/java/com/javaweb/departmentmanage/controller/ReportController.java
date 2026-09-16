@@ -21,35 +21,35 @@ public class ReportController {
     private ReportService reportService;
 
     @GetMapping("/empJobData")
-    // 无请求参数
+    // リクエストパラメータなし
     public Result empJobData(){
-        log.info("统计员工职位人数");
-        // 直接调用service层的empJobData方法
+        log.info("役職別社員人数の集計");
+        // Service層の empJobData メソッドを直接呼び出す
         JobOption jobOption = reportService.empJobData();
         return Result.success(jobOption);
     }
 
     @GetMapping("/empGenderData")
-    // 无请求参数
+    // リクエストパラメータなし
     public Result empGenderData(){
-        log.info("统计员工性别人数");
-        // 直接调用service层的empGenderData方法
+        log.info("性別別社員人数の集計");
+        // Service層の empGenderData メソッドを直接呼び出す
         List<Map<String,Object>> genderList = reportService.empGenderData();
         return Result.success(genderList);
     }
 
     @GetMapping("/studentDegreeData")
     public Result studentDegreeData(){
-        log.info("统计学员学历人数");
-        // 直接调用service层的studentDegreeData方法
+        log.info("最終学歴別受講生人数の集計");
+        // Service層の studentDegreeData メソッドを直接呼び出す
         List<Map<String,Object>> degreeList = reportService.studentDegreeData();
         return Result.success(degreeList);
     }
 
     @GetMapping("/studentCountData")
     public Result studentCountData(){
-        log.info("统计班级人数");
-        // 直接调用service层的studentCountData方法
+        log.info("クラス別在籍人数の集計");
+        // Service層の studentCountData メソッドを直接呼び出す
         ClazzCountOption clazzCountOption= reportService.studentCountData();
         return Result.success(clazzCountOption);
     }

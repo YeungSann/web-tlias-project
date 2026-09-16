@@ -7,27 +7,27 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-// 添加配置类标识注解
+// 設定クラスの識別アノテーションを付与
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-    /*
-    // 更好的处理，直接注入拦截器对象
-    @Autowired
-    private DemoInterceptor demoInterceptor;
-    // 注入token拦截器
+
+    // より良い設計として、インターセプターオブジェクトを直接インジェクションする
+    //@Autowired
+    //private DemoInterceptor demoInterceptor;
+    // トークン検証用インターセプターをインジェクション
     @Autowired
     private TokenInterceptor tokenInterceptor;
 
-    // 重写addInterceptors方法，注册拦截器组件
+    // addInterceptorsメソッドをオーバーライドし、インターセプターコンポーネントを登録する
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        // 对传入的对象调用添加拦截器方法，指定拦截路径为所有路径
+        // 渡されたレジストリオブジェクトに対しインターセプターを追加し、すべてのパス（/**）をインターセプト対象に指定
         registry.addInterceptor(tokenInterceptor)
-                // 指定拦截路径
+                // インターセプト（割り込み検証）対象のURLパスを指定
                 .addPathPatterns("/**")
-                // 指定放行路径
+                // 除外（除外してアクセスを許可する）URLパスを指定（例：ログイン画面）
                 .excludePathPatterns("/login");
     }
 
-     */
+
 }

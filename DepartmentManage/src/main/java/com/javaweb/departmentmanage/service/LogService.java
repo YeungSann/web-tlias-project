@@ -6,6 +6,6 @@ import com.javaweb.departmentmanage.pojo.PageResult;
 
 public interface LogService {
 
-    // 定义一个方法，用来查询日志记录
+    // ログ記録を照会・取得するためのメソッドを定義
     PageResult<Logger> logRecord(LogQueryParam queryParam);
 }

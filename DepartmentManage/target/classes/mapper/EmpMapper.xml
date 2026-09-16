@@ -6,24 +6,24 @@
 
 
 
-    <!--    原来：
+    <!--    変更前：
     <select id="list2" resultType="com.javaweb.departmentmanage.pojo.Emp">
         select e.* ,d.name deptName from emp e left join dept d on e.dept_id = d.id
         where
-            此处会导致识别有问题，因为%是sql中的通配符，需要转义
-            这么写，会导致占位符？出现在' ' 之中，导致？失效
+            % は SQL におけるワイルドカード文字であるためエスケープしないと認識エラーが発生します。
+            以下のように記述するとプレースホルダー ? が引用符 ' ' の中に配置され、? が無効化されます。
             e.name like '%#{name}%'
             and e.gender = #{gender}
             and e.entry_date between #{begin} and #{end}
         order by e.update_time desc
     </select>  -->
 
-<!--    注意：id属性必须与EmpMapper.java中的方法名一致，否则会报错！-->
+    <!--    注意：id 属性は EmpMapper.java 内のメソッド名と完全一致させる必要があります。一致しない場合エラーが発生します！-->
     <!--
     <select id="list2" resultType="com.javaweb.departmentmanage.pojo.Emp">
         select e.* ,d.name deptName from emp e left join dept d on e.dept_id = d.id
         where
-         这里使用了字符串拼接，来避免%被解析为sql中的通配符，导致查询失败
+         ここでは % が SQL のワイルドカードとして解釈され検索が失敗するのを防ぐため、文字列結合（concat）を使用しています
         e.name like concat('%', #{name}, '%')
         and e.gender = #{gender}
         and e.entry_date between #{begin} and #{end}
@@ -34,49 +34,49 @@
     <select id="list3" resultType="com.javaweb.departmentmanage.pojo.Emp">
         select e.* ,d.name deptName from emp e left join dept d on e.dept_id = d.id
         <where>
-        <!--  这里使用了字符串拼接，来避免%被解析为sql中的通配符，导致查询失败 -->
-        <!-- 写入动态sql语句进行条件查询 -->
+            <!--  ここでは % が SQL のワイルドカードとして解釈され検索が失敗するのを防ぐため、文字列結合（concat）を使用しています -->
+            <!-- 動的 SQL ステートメントを記述して条件検索を実行 -->
             <if test="name != null and name != ''">
-            e.name like concat('%', #{name}, '%')
+                e.name like concat('%', #{name}, '%')
             </if>
             <if test="gender != null and gender != ''">
-            and e.gender = #{gender}
+                and e.gender = #{gender}
             </if>
             <if test="begin != null and end != null">
-            and e.entry_date between #{begin} and #{end}
+                and e.entry_date between #{begin} and #{end}
             </if>
         </where>
-            order by e.update_time desc
+        order by e.update_time desc
 
     </select>
 
-    <!--    删除员工基本信息，使用动态sql语句，根据id批量删除员工信息 -->
+    <!--    社員基本情報の削除：動的 SQL ステートメントを使用し、ID に基づき社員情報を一括削除 -->
     <delete id="deleteByIds">
-<!--  delete * from emp where id in (1,2,3) 动态sql批量删除  -->
+        <!--  delete from emp where id in (1,2,3) 動的 SQL による一括削除  -->
         delete from emp where id in
         <foreach collection="ids" item="id" open="(" close=")" separator=",">
-                #{id}
+            #{id}
         </foreach>
     </delete>
 
-<!--  使用外连接查询员工信息和工作经历信息  -->
-<!--    手动结果封装：使用下面的resultMap标签进行封装  -->
+    <!--  外部結合（LEFT JOIN）を使用して社員基本情報および職歴情報を取得  -->
+    <!--    手動結果マッピング：以下の resultMap タグを使用してマッピングを実施  -->
     <select id="selectById" resultMap="empResultMap">
         select e.* ,
-            ex.id exId,
-            ex.begin exBegin,
-            ex.end exEnd,
-            ex.company exCompany,
-            ex.job exJob
+        ex.id exId,
+        ex.begin exBegin,
+        ex.end exEnd,
+        ex.company exCompany,
+        ex.job exJob
         from emp e left join emp_expr ex on e.id = ex.emp_id
         where e.id = #{id}
     </select>
 
-<!--  对上面的resultMap进行手动结果封装：使用resultMap标签进行封装  -->
+    <!--  上記クエリに対する手動結果マッピングの設定：resultMap タグを使用して設定  -->
     <resultMap id="empResultMap" type="com.javaweb.departmentmanage.pojo.Emp">
         <id column="id" property="id" />
-<!--    前面是表中的字段名，后面是pojo中的属性名，用于封装结果    -->
-<!--    普通属性使用result标签进行封装    -->
+        <!--    前方がテーブルの列（カラム）名、後方が POJO のプロパティ名（マッピング用）    -->
+        <!--    通常のプロパティは result タグを使用してマッピング    -->
         <result column="username" property="username" />
         <result column="password" property="password" />
         <result column="name" property="name" />
@@ -89,11 +89,11 @@
         <result column="phone" property="phone" />
         <result column="job" property="job" />
         <result column="salary" property="salary" />
-<!--    封装工作经历信息    -->
-<!--    collection标签用于封装集合对象，ofType属性指定集合对象的元素类型 -->
+        <!--    職歴情報のマッピング    -->
+        <!--    collection タグは集合（リスト等）オブジェクトのマッピングに使用し、ofType 属性で要素の型を指定 -->
         <collection property="exprList" ofType="com.javaweb.departmentmanage.pojo.EmpExpr">
             <id column="exId" property="id" />
-            <!-- 直接复用主表的 id 作为子表的 empId（如果 EmpExpr 类中有 empId 属性的话） -->
+            <!-- 親テーブルの id を子テーブルの empId として直接再利用（EmpExpr クラスに empId プロパティが存在する場合） -->
             <result column="id" property="empId" />
             <result column="exBegin" property="begin" />
             <result column="exEnd" property="end" />
@@ -103,79 +103,85 @@
 
     </resultMap>
 
-<!-- 使用动态sql语句来修改员工基本信息 -->
+    <!-- 動的 SQL ステートメントを使用して社員基本情報を更新 -->
     <update id="updateById">
         update emp
-        <!--   set标签可以自动删除多余的逗号   -->
+        <!--   set タグは末尾の不要なカンマを自動的に削除します   -->
         <set>
             <if test="username != null and username != ''">
-            username = #{username},
+                username = #{username},
             </if>
             <if test="password != null and password != ''">
-            password = #{password},
+                password = #{password},
             </if>
             <if test="name != null and name != ''">
-            name = #{name},
+                name = #{name},
             </if>
             <if test="gender != null">
-            gender = #{gender},
+                gender = #{gender},
             </if>
             <if test="phone != null and phone != ''">
-            phone = #{phone},
+                phone = #{phone},
             </if>
-            <!--   integer类型不可能为''，所以这里不需要判断   -->
+            <!--   Integer 型は空文字 '' になることがないため、ここでの空文字判定は不要です   -->
             <if test="job != null">
-            job = #{job},
+                job = #{job},
             </if>
             <if test="salary != null">
-            salary = #{salary},
+                salary = #{salary},
             </if>
             <if test="image != null and image != ''">
-            image = #{image},
+                image = #{image},
             </if>
             <if test="entryDate != null">
-            entry_date = #{entryDate},
+                entry_date = #{entryDate},
             </if>
-<!--   integer类型不可能为''，所以这里不需要判断   -->
+            <!--   Integer 型は空文字 '' になることがないため、ここでの空文字判定は不要です   -->
             <if test="deptId != null">
-            dept_id = #{deptId},
+                dept_id = #{deptId},
             </if>
             <if test="updateTime != null">
-            update_time = #{updateTime},
+                update_time = #{updateTime},
             </if>
         </set>
 
         where id = #{id}
     </update>
 
+    <!-- パスワード変更：IDに基づいてパスワードを更新 -->
+    <update id="updatePassword">
+        update emp
+        set password = #{password}, update_time = now()
+        where id = #{id}
+    </update>
 
-    <!-- 统计员工信息 -->
-    <!-- 员工职位统计 -->
-    <!-- 没有装有positon和quantity字段的表，因此这里直接使用自动映射为map即可，
-     不需要进行手动封装为resultMap
-     什么时候才需要手动封装为resultMap：
-     一对多查询、一对一查询等复杂查询时，或者是查询字段跟表中字段大量不一致时 -->
+
+    <!-- 社員情報の集計・統計 -->
+    <!-- 社員役職統計 -->
+    <!-- position や quantity フィールドを持つエンティティテーブルが存在しないため、ここでは resultMap による手動マッピングを行わず Map への自動マッピングを直接使用しています。
+     手動での resultMap マッピングが必要となるケース：
+     1対多や1対1などの複雑な結合クエリ、または取得カラム名と POJO プロパティ名が大きく異なる場合 -->
     <select id="countJobData" resultType="map">
         select
         (case
-        when job = 1 then '班主任'
-        when job = 2 then '讲师'
-        when job = 3 then '学工主管'
-        when job = 4 then '教研主管'
-        when job = 5 then '咨询师'
-        else '其他' end ) position,
+        when job = 1 then '担任'
+        when job = 2 then '講師'
+        when job = 3 then '学生課チーフ'
+        when job = 4 then '教研マネージャー'
+        when job = 5 then 'カウンセラー'
+        else 'その他' end ) position,
         count(*)  quantity
         from emp group by job
         order by quantity
     </select>
 
-    <!-- 员工性别统计 -->
+    <!-- 社員性別統計 -->
     <select id="countGenderData" resultType="map">
         select
-<!--   除了case when语句外，还是可以使用if语句来进行流程控制  -->
-            if(gender = 1 ,'男性员工','女性员工') name,
-<!--  注意：在echarts饼状图中，严格要求key的名称为name   -->
-            count(*) value
+        <!--   CASE WHEN 文のほか、IF 関数を使用してフロー制御を行うことも可能です  -->
+        if(gender = 1 ,'男性社員','女性社員') name,
+        <!--  注意：ECharts の円グラフ（パイチャープ）では、キー名が 'name' であることが厳格に求められます   -->
+        count(*) value
         from emp group by gender
     </select>
 

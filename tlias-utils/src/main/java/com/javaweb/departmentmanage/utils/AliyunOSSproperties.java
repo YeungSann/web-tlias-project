@@ -5,12 +5,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Data
-// 添加component注解，将类添加到spring容器中
+// @Component アノテーションを付与し、本クラスをSpring IoCコンテナに登録する
 @Component
-// 添加配置文件中的前缀，用来接收前缀下的值
+// 設定ファイル（application.yml等）のプレフィックスを指定し、該当する設定値を自動的にバインド（取得）する
 @ConfigurationProperties(prefix = "aliyun.oss")
 public class AliyunOSSproperties {
-    // 这是一个实体类，用来接收配置文件中的参数
+    // 設定ファイル（application.yml等）のパラメータ（接続情報）を受け取るためのエンティティクラス（プロパティ保持クラス）
     private String endpoint ;
     private String bucketName ;
     private String region ;

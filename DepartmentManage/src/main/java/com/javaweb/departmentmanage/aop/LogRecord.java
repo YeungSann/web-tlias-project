@@ -20,10 +20,10 @@ import java.util.Arrays;
 @Component
 public class LogRecord {
     /*
-    需求：记录增、删、改 操作日志，包括：
-    操作人、操作时间、执行方法的全类名、执行方法名、方法运行时参数、返回值、方法执行时长
+    要件：追加・削除・更新操作のログを記録する。記録項目：
+    操作者、操作日時、実行メソッドのクラス名、実行メソッド名、実行時引数、戻り値、処理時間
 
-    还要求把日志记录到数据库中
+    また、ログ情報をデータベース（MySQL）に保存すること。
      */
     @Autowired
     private LogMapper logMapper;
@@ -33,42 +33,42 @@ public class LogRecord {
             "execution(* com.javaweb.departmentmanage.controller.*.add*(..)) ||" +
             "execution(* com.javaweb.departmentmanage.controller.*.save*(..))")
     public Object around(ProceedingJoinPoint pjp) throws Throwable {
-        // 0. 记录日志的id， 先获取原有的id值，如果为null或0，则手动设为1，
-        // 如果不为null或0，则直接使用原有的id值+1
+        // 0. ログのIDを記録：まず既存の最大IDを取得し、nullまたは0の場合は手動で1に設定。
+        // nullまたは0でない場合は、既存の最大ID + 1 を使用する
         Integer maxId = logMapper.getMaxId();
         Integer id = (maxId != null && maxId > 0) ? maxId + 1 : 1;
-        // 1. 记录操作人--->后续拓展：通过token解析，获取当前登录用户的id
-        // 从BaseContext类中get方法，获取保存的json数据
+        // 1. 操作者を記録--->今後の拡張：トークン（Token）解析により、現在ログイン中のユーザーIDを取得
+        // BaseContextクラスのgetメソッドを用いて、スレッドに保存されたJSONデータ（ログインユーザーID）を取得する
         Integer operateEmpId = BaseContext.getCurrentEmpId();
 
-        // 2. 记录操作时间
-        // 把时间对象转为标准的yyyy-MM-dd HH:mm:ss格式
+        // 2. 操作日時を記録
+        // 日時オブジェクトを標準の yyyy-MM-dd HH:mm:ss 形式として記録するため、現在時刻（開始時刻）を取得
         LocalDateTime startTime = LocalDateTime.now();
 
-        // 3. 记录执行方法的全类名
-        // 改进：不要获取全类名，而是获取具体的类名，这样前端显示的时候更方便
+        // 3. 実行メソッドのクラス名を記録
+        // 改善：完全修飾クラス名ではなく、簡単なクラス名（SimpleName）を取得することで、フロントエンドでの表示を扱いやすくする
         String className = pjp.getTarget().getClass().getSimpleName();
-        // 4. 记录执行方法名
+        // 4. 実行メソッド名を記録
         String methodName = pjp.getSignature().getName();
-        // 5. 记录方法运行时参数---》把参数转换为字符串类型
+        // 5. メソッド実行時の引数を記録---＞引数配列を文字列形式に変換
         String args = Arrays.toString(pjp.getArgs());
-        // 6. 记录返回值 同时 执行目标方法---》把返回值转换为字符串类型
+        // 6. 戻り値を記録し、同時にターゲットメソッドを実行---＞戻り値を文字列形式に変換
         Object result = pjp.proceed();
-        // 用三目运算符，判断result是否为null，如果是null，就用空字符串代替，否则就用result.toString()方法
+        // 三項演算子を使用し、resultがnullの場合は空文字/null文字列で代用し、それ以外は result.toString() を使用
         String resultStr = (result != null) ? result.toString() : "null";
-        // 7. 记录方法执行时长
+        // 7. メソッドの処理時間を記録
         LocalDateTime endTime = LocalDateTime.now();
         long costTime = Duration.between(startTime, endTime).toMillis();
-        // 先把以上内容记录到一个日志对象中
+        // 上記の各情報を一つのログオブジェクト（Logger）に格納
         Logger logger = new Logger(id, operateEmpId, startTime, className, methodName, args, resultStr, costTime);
-        // 把日志记录到数据库中
+        // ログ情報をデータベースに挿入（インサート）
         logMapper.insert(logger);
 
-        // 8. 记录日志---》不能这样写，这样日志会直接输出到控制台，而不是记录到数据库中
-        // 直接把自定义的日志对象传入即可完成记录
-        log.info("记录日志成功：{}", logger);
+        // 8. ログ出力---＞この記述だけではコンソールに出力されるのみで、DBには記録されない点に注意
+        // 自作のログオブジェクトを渡すことでログ記録の完了を確認・出力する
+        log.info("記録ログ成功：{}", logger);
 
-        // 把目标方法的执行结果返回给调用者
+        // ターゲットメソッドの実行結果を呼び出し元（呼び出し側）へ返却
         return result;
     }
 }

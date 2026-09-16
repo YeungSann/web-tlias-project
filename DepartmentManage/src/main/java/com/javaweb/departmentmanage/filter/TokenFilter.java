@@ -10,49 +10,49 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 
 @Slf4j
-//@WebFilter("/*")// 统一拦截所有路径
+//@WebFilter("/*")// 全パスを統一してインターセプトする設定
 public class TokenFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        // 先把传进来的形参转换为HttpServletRequest和HttpServletResponse
+        // まず受け取った仮引数を HttpServletRequest および HttpServletResponse にダウンキャスト（型変換）する
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-        // 记录日志，拦截到请求
-        log.info("TokenFilter doFilter 拦截到请求");
+        // ログ記録：リクエストをインターセプト
+        log.info("TokenFilter doFilter リクエストをインターセプトしました");
 
-        // 先判断请求路径是否是登录接口
+        // リクエストURIがログインAPI（/login）であるか判定
         if (request.getRequestURI().contains("/login")) {
-            // 登录接口，直接放行
-            log.info("登录接口，直接放行");
+            // ログインAPIの場合は、そのまま後続処理へパス（放行）する
+            log.info("ログインAPIのため、そのままパスします");
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 非登录接口，先获取用户的token
+        // ログインAPI以外の場合、リクエストヘッダーからユーザーのTokenを取得
         String token = request.getHeader("token");
-        // 判断token是否为空
+        // Tokenが存在しない、または空であるか判定
         if (token == null || token.isEmpty()) {
-            log.info("token为不存在或为空，直接响应401状态码");
-            // token为空，直接响应401状态码
-            // 或者使用setStatus方法设置401状态码
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "未登录");
+            log.info("tokenが存在しないか空のため、直接401ステータスコードを返却します");
+            // Tokenが空の場合、直接401（SC_UNAUTHORIZED）ステータスコードをレスポンスする
+            // または setStatus メソッドを使用して401ステータスコードを設定することも可能
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "未認証（未ログイン）");
             return;
         }
 
-        // token不为空，执行对token的解析---》 调用令牌工具类JwtUtils中的parseToken方法解析token
+        // Tokenが空でない場合、Tokenの解析（検証）を実行---＞ トークンユーティリティクラス JwtUtils の parseToken メソッドを呼び出して検証
         try {
-            // 解析token，获取用户信息
+            // Tokenを解析し、ユーザー情報を取得・検証する
             JwtUtils.parseToken(token);
         }catch (Exception ex){
-            // 解析token失败，直接响应401状态码
-            log.info("解析token失败，直接响应401状态码");
+            // Tokenの解析・検証に失敗した場合、直接401ステータスコードをレスポンスする
+            log.info("tokenの解析に失敗したため、直接401ステータスコードを返却します");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
-        // 解析token成功，放行
-        log.info("解析token成功，放行");
+        // Tokenの解析・検証に成功した場合、後続処理へパス（放行）する
+        log.info("tokenの解析に成功しました。パスします");
         filterChain.doFilter(request, response);
     }
 }

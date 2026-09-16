@@ -8,4 +8,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface LogOperation {
+    // カスタムアノテーション：操作ログ記録対象のメソッドを特定するために使用する
 }

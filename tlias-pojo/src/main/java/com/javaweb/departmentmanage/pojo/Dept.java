@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Dept {
-    private Integer id;
-    private String name;
-    private LocalDateTime createTime;
-    private LocalDateTime updateTime;
+    private Integer id; // 部署ID（主キー）
+    private String name; // 部署名
+    private LocalDateTime createTime; // レコード作成日時
+    private LocalDateTime updateTime; // レコード更新日時
 }

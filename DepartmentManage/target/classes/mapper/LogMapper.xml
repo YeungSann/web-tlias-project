@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.javaweb.departmentmanage.mapper.LogMapper">
 
-    <!-- 1. 条件统计总数 -->
+    <!-- 1. 条件指定による件数取得（ページング用） -->
     <select id="count" resultType="java.lang.Long">
         select count(*)
         from log l
@@ -22,7 +22,7 @@
         </where>
     </select>
 
-    <!-- 2. 条件分页列表查询 -->
+    <!-- 2. 条件指定によるページング一覧照会 -->
     <select id="page" resultType="com.javaweb.departmentmanage.pojo.Logger">
         select l.id, l.operate_emp_id, l.operation_time, l.class_name, l.method_name, l.args, l.result, l.cost_time
         from log l

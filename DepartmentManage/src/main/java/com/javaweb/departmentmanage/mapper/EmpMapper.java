@@ -10,32 +10,32 @@ import java.util.Map;
 
 @Mapper
 public interface EmpMapper  {
-    // mapper接口层，定义对emp和emp_expr两个表的操作方法
+    // Mapperインターフェース層：empおよびemp_exprの2つのテーブルに対する操作メソッドを定義
 
     /*
-    // 1. 查询总记录数
+    // 1. 総レコード数の取得
     @Select("select count(*) from emp")
     long getTotal();
 
-    // 2. 查询结果列表
-    // 给d.name起别名deptName，用来封装查询到的部门名称
+    // 2. 検索結果リストの取得
+    // d.name に deptName のエイリアスを付与し、取得した部署名をエンティティにマッピング
     @Select("select e.* ,d.name deptName from emp e left join dept d on " +
             "e.dept_id = d.id order by e.update_time desc limit #{start}, #{pageSize}")
     public List<Emp> findPage(@Param("start") Integer start, @Param("pageSize") Integer pageSize);
      */
 
-    // 查询员工数据
-    // 因为自动分页，因此不需要写入起始索引和每页记录数
-    // 注意点：使用pagehelper分页查询时，sql语句的末尾绝对不能加;分号。
-    // 因为pagehelper会自动给sql语句添加limit语句，如果加了;分号，会导致sql语句语法错误
+    // 社員データの取得
+    // 自動ページング（PageHelper）を使用するため、開始インデックスおよびページサイズの指定は不要
+    // 注意点：PageHelperを使用したページング検索時、SQL文の末尾に「;（セミコロン）」を絶対に入れないこと。
+    // PageHelperが自動的にLIMIT句を追加するため、セミコロンがあるとSQL構文エラーが発生する
     /*
     @Select("select e.* ,d.name deptName from emp e left join dept d on " +
             "e.dept_id = d.id order by e.update_time desc")
     public List<Emp> list();
 
 
-    // 条件分页查询方法
-    // 注意，此处的sql语句比较复杂，因此需要采用mapper.xml映射来处理
+    // 条件付きページング検索メソッド
+    // 注意：こちらのSQL文は複雑なため、mapper.xmlマッピングファイルを使用して処理を行う
     //@Select("select e.* ,d.name deptName from emp e left join dept d on " +
     //        "e.dept_id = d.id where e.name like '%#{name}%' and e.gender = #{gender} " +
     //        "and e.entry_date between #{begin} and #{end} order by e.update_time desc ")
@@ -43,46 +43,49 @@ public interface EmpMapper  {
                     @Param("begin") LocalDate begin, @Param("end") LocalDate end);
      */
 
-    // 条件分页查询---优化
+    // 条件付きページング検索---最適化版（オブジェクトラッピング方式）
     List<Emp> list3(EmpQueryParam empQueryParam);
 
 
-    // 新增员工的两个sql语句---注意第二步需要批量保存员工的工作经历信息---因此第二步需要在empExprMapper中定义
-    // 1. 保存员工基本信息
-    // 通过options注解，指定使用主键，并把id返回
+    // 社員新規登録の2つのSQLステートメント---ステップ2の職歴情報一括保存は empExprMapper に定義が必要
+    // 1. 社員基本情報の保存
+    // @Options アノテーションにより自動生成キー（主鍵）の使用を指定し、生成されたidをオブジェクトに返却
     @Options(useGeneratedKeys = true, keyProperty = "id")
     @Insert("insert into emp (username,name,gender,phone,job, salary, image, entry_date,dept_id,create_time,update_time) values " +
             "(#{username},#{name},#{gender},#{phone},#{job},#{salary},#{image},#{entryDate},#{deptId},#{createTime},#{updateTime})")
     void saveEmp(Emp emp);
 
 
-    // 删除员工信息
+    // 社員情報の削除（IDリストによる一括削除）
     void deleteByIds(@Param("ids")List<Integer> ids);
 
-    // 查询员工基本信息
+    // 社員基本情報の取得
     Emp selectById(Integer id);
 
-    // 修改员工基本信息
+    // 社員基本情報の更新
     void updateById(Emp emp);
 
-    // 统计员工职位人数---》封装到一个map集合中
+    // 役職別社員数の集計---＞Mapコレクションのリストとしてカプセル化
     List<Map<String,Object>> countJobData();
 
-    // 统计员工性别人数---》封装到一个map集合中
-    // 指定map的key为name
+    // 性別別社員数の集計---＞Mapコレクションのリストとしてカプセル化
+    // Mapのキー名を "name" に指定
     //@MapKey("name")
-    // 使用了map作为resultType，mybatis底层会直接封装为一个list<map<>>集合，只需要这个返回值往上抛
+    // resultType に Map を使用した場合、MyBatis内部で List<Map<String, Object>> 形式にカプセル化されるため、そのまま上位層へ返却する
     List<Map<String, Object>> countGenderData();
 
-    // 查询全部班主任的信息
+    // 全担任（job = 1）情報の取得
     @Select("select id, name from emp where job = 1")
     List<Emp> listMaster();
 
-    // 根据部门id查询部门下是否有员工
+    // 部署IDに基づき、該当部署内に所属社員が存在するか判定（件数取得）
     @Select("select count(*) from emp where dept_id = #{id}")
     Long findByDeptId(Integer id);
 
-    // 直接同时通过用户名和密码查询员工信息
+    // ユーザー名とパスワードによる社員情報の直接照会（認証用）
     @Select("select * from emp where username = #{username} and password = #{password}")
     Emp selectByUsernameAndPassword(@Param("username") String username, @Param("password") String password);
+
+    // パスワードの更新（IDに基づき）
+    int updatePassword(@Param("id") Integer id, @Param("password") String password);
 }

@@ -11,116 +11,114 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-// 声明一个Slf4j日志注解，用来添加日记记录器log
+// Slf4jログアノテーションを宣言し、ログロガー（log）を自動追加する
 @Slf4j
-// 声明共同的请求路径，下面的方法不需要重复书写路径
+// 共通のリクエストパスを宣言。以下の各メソッドでパスを重複して記述する必要をなくす
 @RequestMapping("/depts")
-// 声明这是一个请求处理类
+// 本クラスがHTTPリクエストを処理するコントローラークラス（@Controller + @ResponseBody）であることを宣言
 @RestController
 public class DeptController {
-    // 创建一个日志常量对象,并传入本类的字节码对象
-    // 更简化的方式，直接在本类上方，声明一个@Slf4j注解，就可以直接使用log对象了
+    // ログ定数オブジェクトを生成し、本クラスのバイトコードオブジェクトを渡す
+    // より簡略化された方法として、本クラスの上部に @Slf4j アノテーションを付与することで、直接 log オブジェクトを使用可能になる
     // private static final Logger log = LoggerFactory.getLogger(DeptController.class);
 
-    //声明service接口
+    // Serviceインターフェースを注入（DI）
     @Autowired
     private DeptService deptService;
 
-    // 定义一个请求处理方法，返回值是result对象用来确认请求是否成功
-    // 指定请求方式
+    // リクエスト処理メソッドを定义。戻り値はリクエストの成功/失敗を確認するためのResultオブジェクト
+    // HTTPリクエストメソッドを指定
     //@RequestMapping(value = "/depts", method = RequestMethod.GET)
-    // 也可以直接使用getmapping指定请求方式和路径
-    // 这样写的话，也可以应用在post、delete等其他请求方式上
+    // @GetMapping を使用してリクエストメソッド（GET）とパスを直接指定することも可能
+    // この書き方はPOSTやDELETEなどの他のHTTPメソッドにも同様に適用できる
     @GetMapping
     public Result list(){
-        // 改造为使用日志记录器log输出并记录
-        log.info("查询全部部门数据");
-        //System.out.println("查询全部部门数据");
+        // ログロガー（log）を使用した出力・記録処理へ変更
+        log.info("部署データの全件検索");
+        //System.out.println("部署データの全件検索");
 
-        //调用deptService中的查询全部方法，查询全部部门数据
-        // 并把查询结果封装到一个list集合中
+        // deptServiceの全件検索メソッドを呼び出し、すべての部署データを取得する
+        // 取得した結果をListコレクションに格納する
         List<Dept> deptList = deptService.findAll();
 
-        // 代码如果能走到这里，说明查询成功，直接返回成功结果
+        // 処理がここまで到達すれば検索成功を意味するため、成功結果（Result.success）をそのまま返却する
         return Result.success(deptList);
     }
 
-    // 定义一个请求处理方法，用于删除部门
-    @DeleteMapping
-    // 一旦声明了requestparam注解，就必须传递id参数，如果不传递，就会报错
-    // 之所以必须传参数，是因为内部的required属性默认是true，必须传递参数
-    // 可以手动修改为false
+    // 部署削除用のリクエスト処理メソッドを定義
+    // @RequestParam アノテーションを付与すると、idパラメータの送信が必須となる。送信されない場合はエラーが発生する
+    // 必須となる理由は、内部の required 属性のデフォルト値が true に設定されているためである
+    // 手動で false に変更することも可能
 
-    // 而如果@requestparam中的字段名，跟我们请求的形参名是一致的，那么可以直接省略@requestparam的书写
-    // 实际业务逻辑中：用来controller层是用来接收前端发来的请求参数的，也就是id编号
+    // なお、@RequestParam で指定する属性名とメソッドの引数名が一致している場合は、@RequestParam の記述を省略可能
+    // 実際の業務ロジック：Controller層はフロントエンドから送信されたリクエストパラメータ（部署ID）を受け取るために使用する
     public Result deleteById(@RequestParam(value = "id", required = false) Integer id){
-        // 改造为使用日志记录器log输出并记录
-        log.info("删除部门:{}",id);//{}表示占位符，用来表示id参数
-        //System.out.println("删除部门:"+id);
+        // ログロガー（log）を使用した出力・記録处理へ変更
+        log.info("部署削除:{}",id);// {} はプレースホルダー（占位符）であり、idパラメータの値が入る
+        //System.out.println("部署削除:"+id);
 
-        // 调用deptService中的删除方法，删除部门
+        // deptServiceの削除メソッドを呼び出し、該当する部署を削除する
         deptService.deleteById(id);
-        // 代码如果能走到这里，说明删除成功，直接返回成功结果
-        return Result.success("删除成功");
+        // 処理がここまで到達すれば削除成功を意味するため、成功メッセージ付きの成功結果を返却する
+        return Result.success("削除成功");
     }
 
     /*
-    并不推荐
+    非推奨の書き方
 
-    // 比较原生的办法：使用httpservletrequest获取请求参数id
+    // サーブレット標準に近い従来の方法：HttpServletRequest を使用してリクエストパラメータ id を取得する
     @DeleteMapping("/depts")
     public Result deleteById2(HttpServletRequest request){
         String idStr = request.getParameter("id");
         int id = Integer.parseInt(idStr);
-        System.out.println("删除部门"+id);
+        System.out.println("部署削除"+id);
 
-        // 因为删除操作不需要返回额外的数据，因此直接调用result中的无参success方法即可
+        // 削除操作では追加のデータ返却が不要なため、Resultの引数なし success メソッドを直接呼び出して返却する
         return Result.success();
     }
      */
 
 
-    // 写一个新增部门的方法
+    // 部署新規登録（追加）メソッドを記述
+    // 重要なポイント：@RequestBody アノテーションを使用して、フロントエンドから送信されたJSON文字列を対応するエンティティオブジェクトに変換し、Controller層の引数に代入する
     @PostMapping
-    // 关键写法：使用@requestbody注解，把前端发送的json字符串，转换为对应的实体类对象，再赋值给controller层中的参数
     public Result addDept(@RequestBody Dept dept){
-        // 改造为使用日志记录器log输出并记录
-        log.info("新增部门:{}",dept);
-        //System.out.println("新增部门:"+dept);
+        // ログロガー（log）を使用した出力・記録処理へ変更
+        log.info("部署新規登録:{}",dept);
+        //System.out.println("部署新規登録:"+dept);
 
-        // 调用deptService中的新增方法，新增部门
+        // deptServiceの登録メソッドを呼び出し、新しい部署を追加する
         deptService.addDept(dept);
-        // 代码如果能走到这里，说明新增成功，直接返回成功结果
-        return Result.success("新增部门成功");
+        // 処理がここまで到達すれば登録成功を意味するため、成功結果を返却する
+        return Result.success("部署追加成功");
     }
 
-    // 写一个根据id查询部门数据的方法
-    // 使用{}标识符用来表示路径参数，id就是路径参数的名称
+    // ID指定による部署データ検索メソッドを記述
+    // {} 識別子を使用してパスパラメータ（Path Variable）を表し、idがパスパラメータの名前となる
     @GetMapping("/{id}")
-    // 必须使用@PathVariable注解，来接收路径参数id
-    // 当然，也可以不使用@PathVariable注解，直接使用id参数，但是这样写的话，路径参数的名称必须和形参名一致
+    // パスパラメータ id を受け取るために、必ず @PathVariable アノテーションを使用する
+    // なお、@PathVariable アノテーションで名前を明示しない場合でも、パスパラメータ名と引数名が一致していればバインド可能
     public Result findById(@PathVariable("id") Integer id){
-        // 改造为使用日志记录器log输出并记录
-        log.info("根据id查询部门数据:{}",id);//{}表示占位符，用来表示id参数
-        //System.out.println("根据id查询部门数据:"+id);
+        // ログロガー（log）を使用した出力・記録処理へ変更
+        log.info("ID指定による部署データ検索:{}",id);// {} はプレースホルダーであり、idパラメータの値が入る
+        //System.out.println("ID指定による部署データ検索:"+id);
 
-        // 调用deptService中的查询方法，根据id查询部门数据
+        // deptServiceの検索メソッドを呼び出し、IDに基づいて部署データを取得する
         Dept dept = deptService.findById(id);
-        // 代码如果能走到这里，说明查询成功，直接返回成功结果
+        // 処理がここまで到達すれば検索成功を意味するため、成功結果を返却する
         return Result.success(dept);
     }
 
-    // 写一个修改部门的方法
-    @PutMapping
-    // 添加@requestbody注解，把前端发送的json字符串，转换为对应的实体类对象，再赋值给controller层中的参数
-       public Result updateDept(@RequestBody Dept dept){
-        // 改造为使用日志记录器log输出并记录
-        log.info("修改部门:{}",dept);
-        //System.out.println("修改部门:"+dept);
+    // 部署更新（修改）メソッドを記述
+    // @RequestBody アノテーションが付与されており、フロントエンドから送信されたJSON文字列をエンティティオブジェクトに変換して引数に代入する
+    public Result updateDept(@RequestBody Dept dept){
+        // ログロガー（log）を使用した出力・記録処理へ変更
+        log.info("部署データ更新:{}",dept);
+        //System.out.println("部署更新:"+dept);
 
-        // 已经获取到当前部门的名称，调用service层中的更新方法，完成修改操作
+        // 現在の部署情報を取得後、Service層の更新メソッドを呼び出して変更操作を完了させる
         deptService.updateDept(dept);
-        // 代码如果能走到这里，说明修改成功，直接返回成功结果
-        return Result.success("修改部门成功");
+        // 処理がここまで到達すれば更新成功を意味するため、成功結果を返却する
+        return Result.success("部署データ更新成功");
     }
 }

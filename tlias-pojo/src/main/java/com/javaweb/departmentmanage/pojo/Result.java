@@ -3,38 +3,38 @@ package com.javaweb.departmentmanage.pojo;
 import lombok.Data;
 
 /*
- * 后端同一返回结果
+ * バックエンド統一レスポンス結果クラス（API共通フォーマット）
  */
 @Data
 public class Result {
-    private Integer code; // 编码： 1成功，0失败
-    private String msg; // 提示信息
-    private Object data; // 数据
+    private Integer code; // ステータスコード： 1成功，0失敗
+    private String msg; // メッセージ（レスポンス情報）
+    private Object data; // レスポンスデータ
 
-    // 静态方法：成功返回
-    // 无参方法
+    // 静的メソッド：成功時の返却（データなし）
+    // 引数なしメソッド
     public static Result success(){
         Result result = new Result();
-        result.code = 1; // 成功编码
-        result.msg = "success"; // 成功提示信息
-        return result; // 返回成功结果
+        result.code = 1; // 成功ステータスコード
+        result.msg = "success"; // 成功メッセージ
+        return result; // 成功結果を返却
     }
 
-    // 静态方法：成功返回（重载方法）
-    // 有参方法
+    // 静的メソッド：成功時の返却（オーバーロードメソッド）
+    // 引数ありメソッド（データ保持）
     public static Result success(Object data){
         Result result = new Result();
-        result.data = data; // 成功数据
-        result.code = 1; // 成功编码
-        result.msg = "success"; // 成功提示信息
-        return result; // 返回成功结果
+        result.data = data; // レスポンスデータ設定
+        result.code = 1; // 成功ステータスコード
+        result.msg = "success"; // 成功メッセージ
+        return result; // 成功結果を返却
     }
 
-    // 静态方法：失败返回
+    // 静的メソッド：失敗時の返却
     public static Result error(String msg){
         Result result = new Result();
-        result.code = 0; // 失败编码
-        result.msg = msg; // 失败提示信息
-        return result; // 返回失败结果
+        result.code = 0; // 失敗ステータスコード
+        result.msg = msg; // エラーメッセージ設定
+        return result; // 失敗結果を返却
     }
 }

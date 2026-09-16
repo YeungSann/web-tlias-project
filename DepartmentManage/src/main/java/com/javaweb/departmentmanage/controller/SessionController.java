@@ -10,29 +10,29 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 /**
- * HttpSession演示
+ * HttpSessionの動作確認・デモ用コントローラー
  */
 @Slf4j
 @RestController
 public class SessionController {
 
-    //设置Cookie -------- 》 给浏览器设置一个cookie
+    // Cookieの設定 -------- 》 ブラウザに対してCookieを設定・レスポンスする
     @GetMapping("/c1")
     public Result cookie1(HttpServletResponse response){
-        // 创建一个cookie对象，并设置name为login_username，value为tliasSystem
-        response.addCookie(new Cookie("login_username","tliasSystem")); //设置Cookie/响应Cookie
+        // Cookieオブジェクトを生成し、nameを "login_username"、valueを "tliasSystem" に設定
+        response.addCookie(new Cookie("login_username","tliasSystem")); // Cookieの設定/レスポンス
         return Result.success();
     }
 
-    //获取Cookie -------- 》 从浏览器中获取cookie中的数据
+    // Cookieの取得 -------- 》 ブラウザから送信されたCookieデータを取得する
     @GetMapping("/c2")
     public Result cookie2(HttpServletRequest request){
-        // 获取浏览器中所有的cookie对象（一个浏览器中可能有多个cookie对象）
+        // ブラウザから送信されたすべてのCookieオブジェクトを取得（1つのブラウザ内に複数のCookieが存在する可能性があるため）
         Cookie[] cookies = request.getCookies();
-        // 遍历浏览器的所有cookie对象，判断是否存在本类设置的cookie对象
+        // すべてのCookieオブジェクトをループ処理し、本クラスで設定した対象のCookieが存在するか判定
         for (Cookie cookie : cookies) {
             if(cookie.getName().equals("login_username")){
-                System.out.println("login_username: "+cookie.getValue()); //输出name为login_username的cookie
+                System.out.println("login_username: "+cookie.getValue()); // nameが "login_username" であるCookieの値を出力
             }
         }
         return Result.success();
@@ -44,8 +44,8 @@ public class SessionController {
     public Result session1(HttpSession session){
         log.info("HttpSession-s1: {}", session.hashCode());
 
-        // 存储id值到session中
-        session.setAttribute("loginUser", "tom"); //往session中存储数据
+        // ID（またはユーザー情報）をセッションに保存
+        session.setAttribute("loginUser", "tom"); // セッションにデータを格納
         return Result.success();
     }
 
@@ -53,8 +53,8 @@ public class SessionController {
     public Result session2(HttpSession session){
         log.info("HttpSession-s2: {}", session.hashCode());
 
-        // 从session中获取id值
-        Object loginUser = session.getAttribute("loginUser"); //从session中获取数据
+        // セッションからID（またはユーザー情報）を取得
+        Object loginUser = session.getAttribute("loginUser"); // セッションからデータを取得
         log.info("loginUser: {}", loginUser);
         return Result.success(loginUser);
     }

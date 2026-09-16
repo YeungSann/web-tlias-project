@@ -11,16 +11,16 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 public class LoginController {
-    // 这是一个登录控制类，用来处理登录相关的请求
-    // 注入员工服务层，用来调用登录查询方法
+    // ログイン処理用コントローラークラス。ログイン関連リクエストの受付・処理を担当する
+    // 社員サービス層を注入し、ログイン照会メソッドを呼び出す
     @Autowired
     private EmpService empService;
 
-    // 登录方法，post请求，请求参数为username和password
+    // ログイン処理メソッド。POSTリクエスト、リクエストパラメータは username および password（LoginDTO）
     @PostMapping("/login")
     public Result login(@RequestBody LoginDTO loginDTO) {
-        log.info("员工登录: {}", loginDTO.getUsername());
-        // 调用底层的登录查询方法,封装在loginInfo中响应出来
+        log.info("社員ログイン: {}", loginDTO.getUsername());
+        // 最下位（Service/Mapper）のログイン照会メソッドを呼び出し、LoginInfoにカプセル化してレスポンスする
         LoginInfo loginInfo = empService.login(loginDTO);
         return Result.success(loginInfo);
     }

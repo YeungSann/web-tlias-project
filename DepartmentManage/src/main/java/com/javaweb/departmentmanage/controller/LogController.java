@@ -13,20 +13,20 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Slf4j
 public class LogController {
-    // 先注入业务层的bean
+    // まずビジネスロジック層（Service）のBeanを注入
     @Autowired
     private LogService logService;
 
-    // 接收请求，请求参数是queryString，包含page和pageSize两个分页参数
-    // 限定page和pageSize的默认值1和10，以防用户没有输入
+    // リクエストを受信。リクエスト参数はQueryString形式で、pageおよびpageSizeの2つのページングパラメータを含む
+    // ユーザー未指定時のエラーを防ぐため、pageおよびpageSizeのデフォルト値をそれぞれ1および10に制限・設定
     @GetMapping("/log/page")
     public Result logRecord( LogQueryParam queryParam) {
-        // 打印日志
-        log.info("分页查询日志记录参数: {}", queryParam);
+        // ログを出力
+        log.info("操作ログ記録ページング検索パラメータ: {}", queryParam);
 
-        // 直接调用业务层的方法，返回pageresult分页结果
+        // ビジネスロジック層のメソッドを直接呼び出し、PageResult形式のページング検索結果を取得
         PageResult<Logger> pageResult = logService.logRecord(queryParam);
-        // 返回结果
+        // 成功結果を返却
         return Result.success(pageResult);
     }
 }

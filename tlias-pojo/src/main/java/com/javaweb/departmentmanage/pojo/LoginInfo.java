@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-// 封装登录结果的实体类
+// ログイン成功時のレスポンス結果を格納するエンティティクラス（認証情報保持用）
 public class LoginInfo {
-    private Integer id;
-    private String username;
-    private String name;
-    private String token;
+    private Integer id; // ログイン社員ID
+    private String username; // ユーザー名
+    private String name; // 社員氏名
+    private String token; // 認証用JWTトークン
 }

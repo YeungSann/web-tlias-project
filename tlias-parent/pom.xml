@@ -4,13 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- 声明父工程是springboot工程 -->
+    <!-- 親プロジェクトが Spring Boot プロジェクトであることを宣言 -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>4.0.7</version>
-        <!--                这里用来配置父工程的pom文件的相对路径
-                        不写的话，会从maven仓库中查找父工程的pom文件 -->
+        <!--                ここは親プロジェクトの pom ファイルの相対パスを設定する場所
+                        設定しない場合、Maven リポジトリから親プロジェクトの pom ファイルを検索する -->
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -18,17 +18,17 @@
     <artifactId>tlias-parent</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <!-- 父工程的打包方式为pom，不写代码，只进行依赖管理 -->
+    <!-- 親プロジェクトのパッケージング方式は pom。コードは記述せず、依存関係管理のみを行う -->
     <packaging>pom</packaging>
 
-    <!-- 聚合工程 -->
+    <!-- マルチモジュール（集約）プロジェクト -->
     <modules>
         <module>../tlias-utils</module>
         <module>../DepartmentManage</module>
         <module>../tlias-pojo</module>
     </modules>
 
-<!-- 依赖管理   强制所有子工程都必须继承的依赖 -->
+    <!-- 依存関係管理：すべての子プロジェクトで継承が必須となる依存関係 -->
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -37,26 +37,26 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- 引入springboot核心包依赖 -->
+        <!-- Spring Boot コアパッケージ依存関係を導入 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
-            <!--   spring boot版本号不需要指定，直接由pom.xml的bom管理-->
+            <!--   Spring Boot のバージョン指定は不要。pom.xml の BOM によって直接管理される -->
         </dependency>
 
     </dependencies>
 
-<!-- 依赖管理   子工程可以根据需要引入，也可以不引入  父工程只管理版本号-->
+    <!-- 依存関係管理：子プロジェクトが必要に応じて導入・非導入を選択可能（親プロジェクトはバージョン番号のみを管理） -->
     <dependencyManagement>
         <dependencies>
-            <!-- Web 依赖，版本受父工程 spring-boot-dependencies (4.0.7) 管控 -->
+            <!-- Web 依存関係（バージョンは親プロジェクトの spring-boot-dependencies (4.0.7) により管理） -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
                 <version>${spring.boot.starter.web.version}</version>
             </dependency>
 
-            <!-- 导入jwt依赖 -->
+            <!-- JWT 依存関係を導入 -->
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt</artifactId>
@@ -64,14 +64,14 @@
                 <scope>compile</scope>
             </dependency>
 
-            <!-- 导入阿里云OSS依赖 -->
+            <!-- アリババクラウド OSS 依存関係を導入 -->
             <dependency>
                 <groupId>com.aliyun.oss</groupId>
                 <artifactId>aliyun-sdk-oss</artifactId>
                 <version>${aliyun.sdk.oss.version}</version>
             </dependency>
 
-            <!--  为了使用阿里云，继续引入jaxb依赖 -->
+            <!--  アリババクラウド利用のため、引き続き JAXB 依存関係を導入 -->
             <dependency>
                 <groupId>javax.xml.bind</groupId>
                 <artifactId>jaxb-api</artifactId>
@@ -82,7 +82,7 @@
                 <artifactId>activation</artifactId>
                 <version>${activation.version}</version>
             </dependency>
-            <!-- no more than 2.3.3-->
+            <!-- 2.3.3 以下であること -->
             <dependency>
                 <groupId>org.glassfish.jaxb</groupId>
                 <artifactId>jaxb-runtime</artifactId>
@@ -96,7 +96,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-<!-- 统一管理版本号 -->
+        <!-- バージョン番号の一括管理 -->
         <jjwt.version>0.12.6</jjwt.version>
         <spring.boot.starter.version>4.0.7</spring.boot.starter.version>
         <lombok.version>1.18.46</lombok.version>
@@ -107,18 +107,18 @@
         <jaxb.runtime.version>2.3.3</jaxb.runtime.version>
     </properties>
 
-<!--  引入私服地址 -->
+    <!--  プライベートリポジトリ（NEXUS等）のアドレスを設定 -->
     <!--
     <distributionManagement>
     -->
-        <!-- release版本的发布地址 -->
+    <!-- Release バージョンの配信用アドレス -->
     <!--
         <repository>
             <id>maven-releases</id>
             <url>http://localhost:8081/repository/maven-releases/</url>
         </repository>
         -->
-        <!-- snapshot版本的发布地址 -->
+    <!-- Snapshot バージョンの配信用アドレス -->
     <!--
         <snapshotRepository>
             <id>maven-snapshots</id>

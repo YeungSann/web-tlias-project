@@ -6,18 +6,18 @@ import com.javaweb.departmentmanage.utils.AliyunOSSproperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-// 先写入配置类注解
+// 設定クラスのアノテーションを付与
 @Configuration
 public class CommonConfig {
-    // 这是一个配置类，用来定义第三方bean对象
+    // サードパーティ製（外部ライブラリ等）のBeanを定義・管理するための設定クラス
     @Bean
     public AliyunOSSOperator aliyunOSSOperator(AliyunOSSproperties aliyunOSSproperties){
-        // 这里一定要先在AliyunOSSproperties类上添加@Component注解
-        // spring会自动在参数中添加@Autowired注解，实现自动注入
+        // ※前提としてAliyunOSSpropertiesクラスに@Componentが付与されている必要がある
+        // Springが自動的に引数に対して@Autowiredと同様の依存性注入（自動インジェクション）を行う
         return new AliyunOSSOperator(aliyunOSSproperties);
     }
 
-    // 手动引入gson对象
+    // Gsonオブジェクトを手動でBean登録
     @Bean
     public Gson gson(){
         return new Gson();

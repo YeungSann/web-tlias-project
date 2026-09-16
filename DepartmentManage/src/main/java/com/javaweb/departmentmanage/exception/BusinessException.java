@@ -1,7 +1,7 @@
 package com.javaweb.departmentmanage.exception;
 
 public class BusinessException extends RuntimeException {
-    // 这是一个业务异常类，用于处理业务层的异常情况
+    // 業務例外クラス（ビジネスロジック層における例外状況を処理するために使用）
     public BusinessException(String message) {
         super(message);
     }

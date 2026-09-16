@@ -6,9 +6,9 @@ import java.util.List;
 
 
 public interface EmpService {
-    // emp的service层，用来规定service实现类中的方法
+    // emp の Service 層：Service 実装クラスで実装すべきメソッドを定義
 
-    // 获取总记录数和结果列表后，封装为pageResult对象，返回
+    // 総レコード数および結果リストを取得後、PageResult オブジェクトにカプセル化して返却する
     /*
     PageResult<Emp> getListPage(Integer page, Integer pageSize);
 
@@ -33,4 +33,7 @@ public interface EmpService {
     List<Emp> listMaster();
 
     LoginInfo login(LoginDTO loginDTO);
+
+    void updatePassword(EmpPasswordParam param);
+
 }

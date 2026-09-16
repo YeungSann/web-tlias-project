@@ -7,12 +7,12 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /*
- * 分页查询结果封装类
+ * ページング検索結果ラップ用クラス（汎用レスポンス構造体）
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class PageResult<T> {
-    private long total;// 总记录数
-    private List<T> rows; // 当前页数据
+    private long total;// 総レコード件数（全データ数）
+    private List<T> rows; // 現在のページのデータリスト
 }

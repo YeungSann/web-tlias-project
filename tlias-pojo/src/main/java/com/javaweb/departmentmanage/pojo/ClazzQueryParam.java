@@ -11,12 +11,12 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ClazzQueryParam {
-    //属性：page、pageSize、name、begin、end
-    private Integer page=1;//当前页码
-    private Integer pageSize=5;//每页显示条数
-    private String name;//班级名称
+    // 検索パラメータ属性：page（ページ番号）、pageSize（1ページあたりの件数）、name（クラス名）、begin（検索開始日）、end（検索終了日）
+    private Integer page=1;// 現在のページ番号（デフォルト値：1）
+    private Integer pageSize=5;// 1ページあたりの表示件数（デフォルト値：5）
+    private String name;// クラス名（あいまい検索用キーワード）
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate begin; // 进入时间--范围开始
+    private LocalDate begin; // 開講日検索範囲：開始日
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate end; // 退出时间--范围结束
+    private LocalDate end; // 開講日検索範囲：終了日
 }

@@ -13,40 +13,42 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
-// 把本工具类放入到ioc容器中
+// 本クラスをIoCコンテナ（Spring Bean）に登録する
 @Component
 public class AliyunOSSOperator {
 
-    // 获取设置了yml参数的实体类，注入到本类中
+    // ymlファイルの配置値を保持するプロパティクラスをインジェクション（注入）する
     @Autowired
     private AliyunOSSproperties aliyunOSSproperties;
 
+    // コンストラクタ
     public AliyunOSSOperator(AliyunOSSproperties aliyunOSSproperties) {
 
     }
 
-    // 因为这个文件是从网络上上传的，因此传入的对象是from表单中的multipart对象
+    // ネットワーク経由でアップロードされたファイルを受け取るため、引数にはフォームのMultipartFileオブジェクトを指定する
     public String upload(MultipartFile file) throws Exception {
-        // 获取yml文件中的参数值
+        // ymlファイルから設定値（エンドポイント、バケット名、リージョン）を取得する
         String endpoint = aliyunOSSproperties.getEndpoint();
         String bucketName = aliyunOSSproperties.getBucketName();
         String region =  aliyunOSSproperties.getRegion();
 
-        // 从环境变量中获取访问凭证。运行本代码示例之前，请确保已设置环境变量OSS_ACCESS_KEY_ID和OSS_ACCESS_KEY_SECRET。
+        // 環境変数からアクセス資格情報（Access Key ID / Secret）を取得する。
+        // ※本コードを実行する前に、環境変数 OSS_ACCESS_KEY_ID および OSS_ACCESS_KEY_SECRET が設定されていることを確認すること。
         EnvironmentVariableCredentialsProvider credentialsProvider = CredentialsProviderFactory.newEnvironmentVariableCredentialsProvider();
 
-        // 获取文件的原始文件名
+        // アップロードされたファイルの元ファイル名（オリジナルファイル名）を取得する
         String originalFileName = file.getOriginalFilename();
 
-        // 获取当前系统日期的字符串，格式是yyyy/MM
+        // 現在のシステム日付を取得し、"yyyy/MM" 形式の文字列にフォーマットする（保存先ディレクトリ名として使用）
         String dir = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM"));
-        // 用uuid生成唯一文件名
+        // UUIDを生成してユニークな（一意の）ファイル名を作成し、元ファイルの拡張子を結合する
         String fileName = UUID.randomUUID() + originalFileName.substring(originalFileName.lastIndexOf("."));
-        // 进行字符串拼接，把dir和fileName拼接起来作为云上的文件名
+        // ディレクトリパスとファイル名を結合し、OSS上のオブジェクト名（パス形式）を生成する
         String objectName = dir + "/" + fileName;
 
-        // 创建OSSClient实例。
-        // 当OSSClient实例不再使用时，调用shutdown方法以释放资源。
+        // OSSClientインスタンスを生成する。
+        // ※OSSClientインスタンスが不要になった後は、リソースを解放するために shutdown() メソッドを呼び出すこと。
         ClientBuilderConfiguration clientBuilderConfiguration = new ClientBuilderConfiguration();
         clientBuilderConfiguration.setSignatureVersion(SignVersion.V4);
         OSS ossClient = OSSClientBuilder.create()
@@ -57,17 +59,18 @@ public class AliyunOSSOperator {
                 .build();
 
         try {
-            // 创建PutObjectRequest对象。
+            // PutObjectRequestオブジェクトを生成（バケット名、オブジェクト名、入力ストリームを設定）
             PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, objectName, file.getInputStream());
-            // 如果需要上传时设置存储类型和访问权限，请参考以下示例代码。
+            // ※アップロード時にストレージタイプやアクセス権限（ACL）を設定する場合は、以下のサンプルコードを参照すること。
             // ObjectMetadata metadata = new ObjectMetadata();
             // metadata.setHeader(OSSHeaders.OSS_STORAGE_CLASS, StorageClass.Standard.toString());
             // metadata.setObjectAcl(CannedAccessControlList.Private);
             // putObjectRequest.setMetadata(metadata);
 
-            // 上传文件。
+            // OSSへファイルをアップロードする
             ossClient.putObject(putObjectRequest);
         } catch (OSSException oe) {
+            // OSS側でリクエストが拒否された（エラーレスポンスが返された）場合の例外处理
             System.out.println("Caught an OSSException, which means your request made it to OSS, "
                     + "but was rejected with an error response for some reason.");
             System.out.println("Error Message:" + oe.getErrorMessage());
@@ -75,16 +78,18 @@ public class AliyunOSSOperator {
             System.out.println("Request ID:" + oe.getRequestId());
             System.out.println("Host ID:" + oe.getHostId());
         } catch (ClientException ce) {
+            // ネットワーク通信不可など、クライアント側で重度な内部エラーが発生した場合の例外处理
             System.out.println("Caught an ClientException, which means the client encountered "
                     + "a serious internal problem while trying to communicate with OSS, "
                     + "such as not being able to access the network.");
             System.out.println("Error Message:" + ce.getMessage());
         } finally {
             if (ossClient != null) {
-                // 释放资源
+                // OSSクライアントのリソースを解放する
                 ossClient.shutdown();
             }
         }
+        // アップロード完了後、アクセス可能なURL（https://bucketName.endpoint/objectName 等）を組み立てて返却する
         return endpoint.split("//")[0] + "//" + bucketName + "." + endpoint.split("//")[1] + "/" + objectName;
     }
 

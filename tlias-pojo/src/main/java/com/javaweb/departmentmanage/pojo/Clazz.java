@@ -11,16 +11,16 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Clazz {
-    private Integer id; //ID
-    private String name; //班级名称
-    private String room; //班级教室
-    private LocalDate beginDate; //开课时间
-    private LocalDate endDate; //结课时间
-    private Integer masterId; //班主任
-    private Integer subject; //学科
-    private LocalDateTime createTime; //创建时间
-    private LocalDateTime updateTime; //修改时间
+    private Integer id; // ID（主キー）
+    private String name; // クラス名（学級名）
+    private String room; // 教室名 / 教室番号
+    private LocalDate beginDate; // 開講日（授業開始日）
+    private LocalDate endDate; // 修了日（授業終了日）
+    private Integer masterId; // 担任ID（担任講師・主任の従業員ID）
+    private Integer subject; // 学科 / 専攻（コース）
+    private LocalDateTime createTime; // レコード作成日時
+    private LocalDateTime updateTime; // レコード更新日時
 
-    private String masterName; //班主任姓名
-    private String status; //班级状态 - 未开班 , 在读 , 已结课
+    private String masterName; // 担任氏名（画面表示用拡張属性）
+    private String status; // クラス状態（未開講 , 受講中 , 修了）
 }

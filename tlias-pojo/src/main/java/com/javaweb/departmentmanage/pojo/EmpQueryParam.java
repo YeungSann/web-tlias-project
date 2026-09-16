@@ -12,12 +12,12 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmpQueryParam {
-    private Integer page=1;//当前页码
-    private Integer pageSize=10;//每页显示条数
-    private String name;//员工姓名
-    private String gender;//性别
+    private Integer page=1;// 現在のページ番号（デフォルト値：1）
+    private Integer pageSize=10;// 1ページあたりの表示件数（デフォルト値：10）
+    private String name;// 社員氏名（あいまい検索用キーワード）
+    private String gender;// 性別
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate begin;// 入职时间--范围开始
+    private LocalDate begin;// 入社年月日検索範囲：開始日
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate end;// 入职时间 --- 范围结束
+    private LocalDate end;// 入社年月日検索範囲：終了日
 }

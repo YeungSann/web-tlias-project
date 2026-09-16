@@ -11,58 +11,58 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-// 创建service层的实现类
-// 交给Spring管理的Bean
+// Service層の実装クラスを作成
+// Spring管理下のBean（@Service）として登録
 @Service
 public class DeptServiceImpl implements DeptService {
-    // 注入mapper接口的实现类对象
+    // インジェクション：Mapperインターフェースの実装クラスオブジェクト
     @Autowired
     private DeptMapper deptMapper;
-    // 注入员工的mapper层对象
+    // インジェクション：社員（Emp）のMapper層オブジェクト
     @Autowired
     private EmpMapper empMapper;
 
-    // 实现父接口的findAll方法，用于查询全部部门数据
+    // 親インターフェースの findAll メソッドを実装し、全部署データを取得
     @Override
     public List<Dept> findAll() {
-        // 调用底层的mapper接口方法查询全部部门数据
+        // 最下層の Mapper インターフェースのメソッドを呼び出して全データ取得
         return deptMapper.findAll();
     }
 
     @Override
     public void deleteById(Integer id) {
-        // 在执行删除逻辑之前，先判断部门下是否有员工
-        // 如果有员工，则不允许删除该部门，并给前端提示错误信息：对不起，当前部门下有员工，不能直接删除！
+        // 削除ロジック実行前に、該当部署に所属社員が存在するか判定
+        // 社員が存在する場合は削除を許可せず、フロントエンドへエラーメッセージ（BusinessException）を返す
         if (empMapper.findByDeptId(id) != 0L && deptMapper.findById(id) != null) {
             throw new BusinessException("对不起，当前部门下有员工，不能直接删除！");
         }
 
-            // 调用底层mapper接口中的删除方法，并把删除的行数返回
-            deptMapper.deleteById(id);
+        // 最下層 Mapper インターフェースの削除メソッドを呼び出す
+        deptMapper.deleteById(id);
     }
 
     @Override
     public void addDept(Dept dept) {
-        // 调用底层mapper接口中的新增方法，新增部门
-        // 新增部门时，需要设置部门的创建时间和更新时间
-        // 直接设为当前时间即可，这样就可以达到，只需要前端输入部门名称，自动填充时间的效果
+        // 最下層 Mapper インターフェースの追加メソッドを呼び出し、部署を新規登録
+        // 部署追加時、作成日時と更新日時を設定する必要がある
+        // 現在日時を直接設定することで、フロントエンドからは部署名のみ入力すれば自動で時間が補完される仕様とする
         dept.setCreateTime(LocalDateTime.now());
         dept.setUpdateTime(LocalDateTime.now());
-        // 调用底层mapper接口中的新增方法，新增部门
+        // 最下層 Mapper インターフェースの追加メソッドを呼び出す
         deptMapper.addDept(dept);
     }
 
     @Override
     public Dept findById(Integer id) {
-        // 调用底层mapper接口中的查询方法，根据id查询部门数据
+        // 最下層 Mapper インターフェースの照会メソッドを呼び出し、IDに基づき部署データを取得
         return deptMapper.findById(id);
     }
 
     @Override
     public void updateDept(Dept dept) {
-        // 更新部门时，需要自动设置部门的更新时间为当前时间
+        // 部署更新時、自動的に更新日時を現在日時に設定
         dept.setUpdateTime(LocalDateTime.now());
-        // 调用底层mapper接口中的更新方法，更新部门数据
+        // 最下層 Mapper インターフェースの更新メソッドを呼び出し、部署データを更新
         deptMapper.updateDept(dept);
     }
 }

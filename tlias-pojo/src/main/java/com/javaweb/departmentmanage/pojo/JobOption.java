@@ -12,6 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 public class JobOption {
 
-    public List<String> jobList = new ArrayList<>();
-    public List<Object> dataList = new ArrayList<>();
+    public List<String> jobList = new ArrayList<>(); // 役職名リスト（グラフのX軸カテゴリ等）
+    public List<Object> dataList = new ArrayList<>(); // 役職別人数リスト（グラフのY軸数值列等）
 }
