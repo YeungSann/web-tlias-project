@@ -5,12 +5,31 @@ RESTful API 設計に基づき、多層アーキテクチャとマルチモジ�
 
 ---
 
+## 📸 画面デモ (System Screenshots & Demo)
+
+### 1. ログイン処理 & JWT認証 (Login & JWT Authentication)
+![Login Demo](./docs/login.gif)
+
+### 2. 従業員一覧・検索 & ページネーション (Employee Query & Pagination)
+![Query Employee Demo](./docs/queryEmp.gif)
+
+### 3. 画像アップロード & クラウドストレージ連携 (File Upload & OSS Integration)
+![Upload Demo](./docs/upload.gif)
+
+### 4. データ統計 & 可視化ダッシュボード (Data Statistics & Visualization)
+![Statistics Demo](./docs/stats.gif)
+
+### 5. AOP操作ログ記録 (AOP Operation Logging)
+![Log Demo](./docs/log.gif)
+
+---
+
 ## 🛠️ 技術スタック (Tech Stack)
 
 - **コアフレームワーク**: Spring Boot 3.x
 - **永続層フレームワーク**: MyBatis
 - **データベース**: MySQL 8.0
-- **プログラミング言語**: Java 17 
+- **プログラミング言語**: Java 17 / 21
 - **ビルドツール**: Maven (マルチモジュール継承構成)
 - **サードパーティサービス & ユーティリティ**:
     - **Lombok**: ボイラープレートコード（Getter/Setter等）の削減
@@ -58,11 +77,33 @@ RESTful API 設計に基づき、多層アーキテクチャとマルチモジ�
 ### 前提条件
 - JDK 17+
 - MySQL 8.0+
-- Maven 3.8
-- +
+- Maven 3.8+
 
 ### 設定手順
 1. **リポジトリのクローン**
    ```bash
    git clone [https://github.com/YeungSann/web-tlias-project.git](https://github.com/Yen/web-tlias-project.git)
    cd web-tlias-project
+2. **データベースの準備**
+    ```bash
+    MySQL に tlias データベースを作成し、付属の tlias.sql スクリプトを実行します。
+
+3. **環境変数の設定 (重要)**
+    ```bash
+    本プロジェクトではセキュリティのベストプラクティスに従い、OSSアクセスキー等の機密情報を環境変数から取得します。
+
+    OS環境変数に以下を設定してください：
+
+    ALIBABA_CLOUD_ACCESS_KEY_ID: Alibaba Cloud OSS AccessKey ID
+
+    ALIBABA_CLOUD_ACCESS_KEY_SECRET: Alibaba Cloud OSS AccessKey Secret
+
+4. **設定ファイルの調整**
+    ```bash
+    tlias-web/src/main/resources/application.yml 内の MySQL 接続情報（username / password）をローカル環境に合わせて変更してください。
+
+5. **プロジェクトのビルド & 起動**
+    ```bash
+    mvn clean install
+   tlias-web モジュールの TliasApplication.java を実行します。
+    
