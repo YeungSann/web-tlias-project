@@ -64,5 +64,5 @@ RESTful API 設計に基づき、多層アーキテクチャとマルチモジ�
 ### 設定手順
 1. **リポジトリのクローン**
    ```bash
-   git clone [https://github.com/Yen/web-tlias-project.git](https://github.com/Yen/web-tlias-project.git)
+   git clone [https://github.com/YeungSann/web-tlias-project.git](https://github.com/Yen/web-tlias-project.git)
    cd web-tlias-project
