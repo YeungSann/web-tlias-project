@@ -26,15 +26,15 @@ RESTful API 設計に基づき、多層アーキテクチャとマルチモジ�
 
 ## 🛠️ 技術スタック (Tech Stack)
 
-- **コアフレームワーク**: Spring Boot 3.x
-- **永続層フレームワーク**: MyBatis
+- **コアフレームワーク**: Spring Boot 4.x
+- **永続層フレームワーク**: MyBatis 4.x
 - **データベース**: MySQL 8.0
-- **プログラミング言語**: Java 17 / 21
+- **プログラミング言語**: Java 17 
 - **ビルドツール**: Maven (マルチモジュール継承構成)
 - **サードパーティサービス & ユーティリティ**:
     - **Lombok**: ボイラープレートコード（Getter/Setter等）の削減
     - **JJWT (JSON Web Token)**: 無状態（Stateless）認証・認可
-    - **Alibaba Cloud OSS**: 顔写真・各種ファイルのクラウドストレージ保存
+    - **Alibaba Cloud OSS**: 顔写真のクラウドストレージ保存
 
 ---
 
@@ -51,7 +51,7 @@ RESTful API 設計に基づき、多層アーキテクチャとマルチモジ�
 - `tlias-parent`: プロジェクト全体の依存バージョンとビルド設定を一括管理
 - `tlias-pojo`: エンティティクラス (Entity)、DTO、VO の定義
 - `tlias-utils`: JWT処理、OSSファイルアップロードなどの共通ユーティリティ
-- `tlias-web`: コントローラー、サービス、ビジネスロジックの実装
+- `DepartmentManage`: コントローラー、サービス、ビジネスロジックの実装
 
 ---
 
@@ -106,4 +106,3 @@ RESTful API 設計に基づき、多層アーキテクチャとマルチモジ�
     ```bash
     mvn clean install
    tlias-web モジュールの TliasApplication.java を実行します。
-    
