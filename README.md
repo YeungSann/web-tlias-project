@@ -82,13 +82,19 @@ RESTful API 設計に基づき、多層アーキテクチャとマルチモジ�
 ### 設定手順
 1. **リポジトリのクローン**
    ```bash
-   git clone [https://github.com/YeungSann/web-tlias-project.git](https://github.com/Yen/web-tlias-project.git)
+   git clone [https://github.com/YeungSann/web-tlias-project.git]
    cd web-tlias-project
 2. **データベースの準備**
     ```bash
     MySQL に tlias データベースを作成し、付属の tlias.sql スクリプトを実行します。
+   
+3. **テスト用初期ログインアカウント**
+    ```bash
+    ユーザー名: satot
+    パスワード: 123456
+    （emp テーブル内の初期データと一致）
 
-3. **環境変数の設定 (重要)**
+4. **環境変数の設定 (重要)**
     ```bash
     本プロジェクトではセキュリティのベストプラクティスに従い、OSSアクセスキー等の機密情報を環境変数から取得します。
 
@@ -98,11 +104,11 @@ RESTful API 設計に基づき、多層アーキテクチャとマルチモジ�
 
     ALIBABA_CLOUD_ACCESS_KEY_SECRET: Alibaba Cloud OSS AccessKey Secret
 
-4. **設定ファイルの調整**
+5. **設定ファイルの調整**
     ```bash
     tlias-web/src/main/resources/application.yml 内の MySQL 接続情報（username / password）をローカル環境に合わせて変更してください。
 
-5. **プロジェクトのビルド & 起動**
+6. **プロジェクトのビルド & 起動**
     ```bash
     mvn clean install
    tlias-web モジュールの TliasApplication.java を実行します。
